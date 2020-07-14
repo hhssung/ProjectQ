@@ -1,1 +1,5 @@
 node_modules
+
+# no database files
+config/database.js
+config/jwt.js
