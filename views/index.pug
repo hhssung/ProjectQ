@@ -3,3 +3,27 @@ extends layout
 block content
   h1= title
   //p Welcome to #{title}
+  p
+  p 로그인
+  p
+  form(action="/user/login", method="post")
+    div
+      input(type='text' name='email' placeholder='email')
+    div
+      input(type='password' name='password' placeholder='password')
+    div
+      input(type='submit' value='Login')
+
+  p
+  p 회원가입
+  p
+  form(action="/user/signup", method="post")
+    div
+      input(type='text' name='email' placeholder='email')
+    div
+      input(type='text' name='name' placeholder='name')
+    div
+      input(type='password' name='password' placeholder='password')
+    div
+      input(type='submit' value='Login')
+
