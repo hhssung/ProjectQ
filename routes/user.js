@@ -1,13 +1,17 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var dbconnect = require("../config/database.js");
-var connection = dbconnect.init();
+const dbconnect = require("../config/database");
+const connection = dbconnect.init();
 
-var jwt = require("jsonwebtoken");
-var jwtobj = require("../config/jwt");
+const jwt = require("jsonwebtoken");
+const jwtobj = require("../config/jwt");
 
-//로그인
+const sendmail = require('../my_modules/sendmail');
+
+//////////
+//로그인//
+//////////
 router.post('/login', function (req, res) {
   let body = req.body;
   let email = body.email;
@@ -41,7 +45,7 @@ router.post('/login', function (req, res) {
       }
     }
     //이메일이 없을 경우
-    else{
+    else {
       res.json({
         res: "no email"
       });
@@ -49,7 +53,9 @@ router.post('/login', function (req, res) {
   })
 });
 
-//회원가입
+///////////
+//회원가입//
+///////////
 router.post('/signup', function (req, res) {
   let body = req.body;
   let email = body.email;
@@ -58,21 +64,20 @@ router.post('/signup', function (req, res) {
 
   //이메일 중복 확인
   let query1 = "select * from user where email = ?";
-  connection.query(query1, [email], function(err,row){
+  connection.query(query1, [email], function (err, row) {
     if (err) {
       throw err
     };
     //이메일 중복
-    if(row.length >= 1)
-    {
+    if (row.length >= 1) {
       res.json({
         res: "already existing email"
       });
     }
     //없는 이메일, db에 추가
-    else{
+    else {
       let query2 = "insert into user values (?,?,?)"
-      connection.query(query2, [email,name,password], function(err,row){
+      connection.query(query2, [email, name, password], function (err, row) {
         if (err) {
           throw err
         };
@@ -84,42 +89,58 @@ router.post('/signup', function (req, res) {
   })
 });
 
-
-
-
-//임시 비밀번호 발송
+/////////////////////
+//임시 비밀번호 발송//
+/////////////////////
 router.post('/findpw', function (req, res) {
-    
-});
+  let body = req.body;
+  let email = body.email;
 
-
-
-
-
-//////////////////////////////////////////////////////연습용/////////////////////
-//  Login Function
-
-router.get('/Loginpractice', function (req, res, next) {
-  let e_mail = "abc@naver.com";
-  let query1 = "select password from user where email='" + e_mail + "'";
-  let token1 = jwtobj.token(e_mail, "5m");
-
-  connection.query(query1, function (err, rows) {
+  //이메일 있는지 확인
+  let query1 = "select * from user where email = ?";
+  connection.query(query1, [email], function (err, row) {
     if (err) {
       throw err
     };
-    if (rows[0].password == "1235") {
-      res.cookie("user", token1);
+    //이메일 없을 경우
+    if (row.length == 0) {
       res.json({
-        token: token1
+        res: "No existing email"
       });
-    } else {
-      res.render('index', {
-        title: 'password failed'
-      });
+    }
+    //이메일 존재할 경우
+    else {
+      let query2 = "update user set password = ? where email = ?"
+      let randomPW = Math.random().toString(36).substr(2, 11); // 10자리 password
+      //랜덤한 비밀번호로 변경
+      connection.query(query2, [randomPW, email], function (err, row) {
+        if (err) {
+          throw err
+        };
+        //이메일 전송
+        try {
+          sendmail(email, randomPW);
+          res.json({
+            res: "send email success"
+          });
+        }
+        //이메일 전송 실패
+        catch(e)
+        {
+          console.log(e);
+          res.json({
+            res: "send email failed"
+          });
+        }
+      })
     }
   })
 });
+
+
+
+
+//////////////////////////////////////////////////////연습용///////////////////////////////////////////
 
 // jwt 확인하기
 
@@ -138,7 +159,6 @@ router.get('/Loginpractice/logincheck', function (req, res, next) {
     });
   }
 });
-
 
 module.exports = router;
 

@@ -1,14 +1,19 @@
+// API 테스트용 임시 페이지
+
 extends layout
 
 block content
   h1= title
   //p Welcome to #{title}
+
+  - var temp = "http://9f28e43a7abe.ngrok.io"
+  
   p
   p 로그인
   p
-  form(action="/user/login", method="post")
+  form(action= temp + "/user/login", method="post")
     div
-      input(type='text' name='email' placeholder='email')
+      input(type='text' name='email' placeholder= temp+"/user/login")
     div
       input(type='password' name='password' placeholder='password')
     div
@@ -17,7 +22,7 @@ block content
   p
   p 회원가입
   p
-  form(action="/user/signup", method="post")
+  form(action=temp + "/user/signup", method="post")
     div
       input(type='text' name='email' placeholder='email')
     div
@@ -25,5 +30,21 @@ block content
     div
       input(type='password' name='password' placeholder='password')
     div
-      input(type='submit' value='Login')
+      input(type='submit' value='signup')
+
+  p
+  p pw 분실시 임시pw 발송
+  p
+  form(action=temp + "/user/findpw", method="post")
+    div
+      input(type='text' name='email' placeholder='email')
+    div
+      input(type='submit' value='change PW')
+
+  p
+  p 관리자 페이지 이동 (미완)
+  p
+  form(action=temp + "/admin", method="get")
+    div
+      input(type='submit' value='관리자 페이지로~')
 

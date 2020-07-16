@@ -1,5 +1,6 @@
 node_modules
 
-# no database files
+# no secure files
 config/database.js
 config/jwt.js
+config/mymail.js
