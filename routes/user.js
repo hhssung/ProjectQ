@@ -17,6 +17,8 @@ router.post('/login', function (req, res) {
   let email = body.email;
   let password = body.password;
 
+  console.log(body);
+
   //이메일 확인
   let query1 = "select password from user where email = ?";
   connection.query(query1, [email], function (err, row) {

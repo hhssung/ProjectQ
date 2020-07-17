@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    h1= "관리자 페이지"
+
+    table(style='width:100%', border='1')
+        thead
+            th "상품명"
+            th "체크박스"
+        tbody
+        - for (var x=0; x<p_length; x++)
+        tr
+            tb
+            tb
