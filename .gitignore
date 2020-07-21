@@ -4,3 +4,6 @@ node_modules
 config/database.js
 config/jwt.js
 config/mymail.js
+
+#no excel/image files
+upload

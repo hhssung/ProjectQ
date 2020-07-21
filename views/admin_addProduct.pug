@@ -1,0 +1,48 @@
+extends layout
+
+block content
+    h1= "상품 추가"
+    p
+    p
+
+    form(action= temp + "/admin/add_product" method="post")
+        table
+            tr
+                td= "상품명 입력: "
+                td
+                    input(type='text' name='p_name' placeholder= "상품 명")
+            tr
+                td= "상품 로고: "
+                td
+                    input(type='file' name='p_logo' accept="image/*")
+            tr
+                td= "상품 배경 사진: "
+                td
+                    input(type='file' name='p_background' accept="image/*")
+            tr
+                td= "상품 설명용 사진: "
+                td
+                    input(type='file' name='p_explain' accept="image/*")
+            tr
+                td= "상품 설명 입력(최대 300글자): "
+                td
+                    textarea(rows='6' cols='40' maxlength='300' name='p_intro' placeholder= "상품 설명")
+            tr
+                td= "푸시 형태 (정시 / 랜덤): "
+                td
+                    | 정시: 
+                    input(type='radio', name="push_type", value="no_ran", margin-right= "20px", checked)
+                    | ,   랜덤: 
+                    input(type='radio', name="push_type", value="ran")
+            tr
+                td= "시간 설정: "
+                td
+                    input(type='time', name="start_time", value='00:00:00' checked)
+                    |  ~  
+                    input(type='time', name="finish_time", value='23:59:59' checked)
+            tr
+                td= "질문 엑셀 파일 업로드: "
+                td
+                    input(type='file' name='p_excel' accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        div
+            input(type='submit' id='mybutton' value='상품 업로드')

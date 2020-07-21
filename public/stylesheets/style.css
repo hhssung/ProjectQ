@@ -1,8 +1,31 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-}
-
 a {
   color: #00B7FF;
+}
+
+table{
+  width: 100%;
+  text-align: center;
+}
+
+th{
+  border: 2px solid #444444;
+  font: 1.5em;
+}
+
+td{
+  border: 1px solid #444444;
+}
+
+#mybutton{
+  font: 1.2em;
+  color: white;
+  text-align: center;
+  background-color: black;
+  margin-right: 5%;
+}
+
+
+body {
+  padding: 50px;
+  font: 1em "Lucida Grande", Helvetica, Arial, sans-serif;
 }

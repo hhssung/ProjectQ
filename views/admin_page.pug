@@ -2,13 +2,24 @@ extends layout
 
 block content
     h1= "관리자 페이지"
+    p
+    p
 
-    table(style='width:100%', border='1')
-        thead
-            th "상품명"
-            th "체크박스"
-        tbody
-        - for (var x=0; x<p_length; x++)
-        tr
-            tb
-            tb
+    form( method="post" )
+        table
+            tr
+                th(width = "10%")= "로고"
+                th(width="80%")= "상품 명"
+                th(width="10%")= "check"
+            tbody
+            for product in productlist
+                tr
+                    td
+                        img(src=product.img_logo)
+                    td= product.product_name
+                    td
+                        input(type='checkbox', name= 'check', value= product.product_id)
+        p
+        div
+            input(type='submit' id='mybutton' value='해당 상품 삭제' onclick="javascript: form.action= '" + temp + "/admin/delete_product'")
+            input(type='submit' id='mybutton' value='상품 추가' onclick="javascript: form.action= '" + temp + "/admin/add_product_page'")
