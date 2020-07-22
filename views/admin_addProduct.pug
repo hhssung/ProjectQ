@@ -5,7 +5,7 @@ block content
     p
     p
 
-    form(action= temp + "/admin/add_product" method="post")
+    form(method="post" enctype="multipart/form-data" action= temp + "/admin/add_product" )
         table
             tr
                 td= "상품명 입력: "
@@ -41,7 +41,7 @@ block content
                     |  ~  
                     input(type='time', name="finish_time", value='23:59:59' checked)
             tr
-                td= "질문 엑셀 파일 업로드: "
+                td= "질문 엑셀 파일 업로드 (.xlsx): "
                 td
                     input(type='file' name='p_excel' accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
         div
