@@ -8,7 +8,10 @@ const base = './routes/';
 
 var indexRouter = require(base+'index');
 var userRouter = require(base+'user');
+
 var adminRouter = require(base+'admin');
+var admin_addProductRouter = require(base+'admin_addproduct');
+var admin_deleteProductRouter = require(base+'admin_deleteproduct');
 
 var app = express();
 
@@ -25,6 +28,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
+app.use('/admin/add_product', admin_addProductRouter);
+app.use('/admin/delete_product',admin_deleteProductRouter);
+
 app.use('/files', express.static('upload'));  // http://localhost:3961/files/~~~.png 이런 식으로 불러오기 가능
 
 // catch 404 and forward to error handler

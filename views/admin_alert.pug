@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    
+    h1 #{alert_type}
+    
+    p
+    p
+
+    h2 #{alert_details}
+
+    p
+    p 상품 관리 페이지
+    p
+    form(action= temp + "/admin/alert_to_adminpage", method="post")
+        div
+            input(type='submit' id='mybutton' value='상품 관리 페이지로')

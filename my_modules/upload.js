@@ -6,8 +6,9 @@ var _storage = multer.diskStorage({
         cb(null, 'upload/')
     },
     filename: function (req, file, cb) { //어떤 이름으로 저장?
-        let extension = path.extname(file.originalname);    //확장자 추출
-        cb(null, Date.now()+ "." + extension) // 현재 시간.jpg 형식으로 저장
+        //let extension = path.extname(file.originalname);    //확장자 추출
+        //let basename = path.basename(file.originalname, ext);
+        cb(null, Date.now()+"_"+file.originalname) // 현재 시간.jpg 형식으로 저장
     }
 });
 

@@ -15,11 +15,12 @@ block content
             for product in productlist
                 tr
                     td
-                        img(src=product.img_logo)
+                        img(src=product.img_logo width=80 height=80)
                     td= product.product_name
                     td
-                        input(type='checkbox', name= 'check', value= product.product_id)
+                        input(type='checkbox', name= 'productID', value= product.product_id)
         p
         div
+            input(type='text' name='deletecheck' placeholder= "\"삭제하겠습니다\" 입력")
             input(type='submit' id='mybutton' value='해당 상품 삭제' onclick="javascript: form.action= '" + temp + "/admin/delete_product'")
             input(type='submit' id='mybutton' value='상품 추가' onclick="javascript: form.action= '" + temp + "/admin/add_product_page'")
