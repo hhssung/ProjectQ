@@ -28,6 +28,11 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
     let p_explain = req.files.p_explain[0].filename;
     let p_excel = req.files.p_excel[0].filename;
 
+    start_time = parsetime(start_time);
+    end_time = parsetime(end_time);
+    console.log(start_time);
+    console.log(end_time);
+
     //product table에 상품 집어넣기
     let query = "insert into product SET ?"
     let query_inputs = {
@@ -64,8 +69,6 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
             query2_inputs.push([0, row.insertId, jsondata[i].num, jsondata[i].content]);
         }
 
-        console.log(query2_inputs);
-
         // question table에 집어넣기
         let query2 = "insert into question values ?";
         connection.query(query2, [query2_inputs], function (err, row) {
@@ -83,5 +86,12 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
         throw err;
     });
 });
+
+// 13:59:30 같은 시간을 1359로 가공해주는 함수
+function parsetime(p_time)
+{
+    return p_time.substring(0,5).replace(":","");
+}
+
 
 module.exports = router;
