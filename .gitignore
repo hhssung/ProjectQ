@@ -7,3 +7,6 @@ config/mymail.js
 
 #no excel/image files
 upload
+
+#no DDL
+DDL.txt
