@@ -29,6 +29,23 @@ block content
       input(type='submit' value='signup')
 
   p
+  p 상품 시간 변경
+  p
+  form(action=temp + "/subscribe/time_setting", method="post")
+    div
+      input(type='text' name='p_ID' placeholder='productID')
+    div
+      input(type='text' name='start_time' placeholder='starttime')
+    div
+      input(type='text' name='end_time' placeholder='endtime')
+    div
+      input(type='text' name='pushType' placeholder='pushType 0 or 1')
+    //div
+      input(type='text' name='subscribe' placeholder='0구독안됨 or 1구독')
+    div
+      input(type='submit' value='subscribe or not')
+
+  p
   p pw 분실시 임시pw 발송
   p
   form(action=temp + "/user/findpw", method="post")
