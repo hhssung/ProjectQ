@@ -32,7 +32,7 @@ router.post('/login', function (req, res) {
       pwcheck = row[0].password;
       //비밀번호 일치, jwt 토큰 전송
       if (password == pwcheck) {
-        let token1 = jwtobj.token(email, "5m");
+        let token1 = jwtobj.token(email, "50m");
         res.cookie("user", token1);
         res.json({
           token: token1,
