@@ -15,6 +15,7 @@ var admin_deleteProductRouter = require(base+'admin_deleteproduct');
 var productRouter = require(base+'product');
 var diaryRouter = require(base+'diary');
 var subscribeRouter = require(base+'subscribe');
+var makelinkRouter = require(base+'makelink');
 
 var app = express();
 
@@ -36,8 +37,10 @@ app.use('/admin/delete_product',admin_deleteProductRouter);
 app.use('/product',productRouter);
 app.use('/diary',diaryRouter);
 app.use('/subscribe',subscribeRouter);
+app.use('/makelink',makelinkRouter);
 
 app.use('/files', express.static('upload'));  // http://localhost:3961/files/~~~.png 이런 식으로 불러오기 가능
+app.use('/links', express.static('links'));  // http://localhost:3961/links/~~~.html 이런 식으로 불러오기 가능
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

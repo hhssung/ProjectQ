@@ -8,6 +8,8 @@ const connection = dbconnect.init();
 
 const variables = require('../my_modules/var');
 
+const makePW = require('../config/protectPW');
+
 /////////////////////////////
 // 관리자 페이지 로그인 화면 //
 /////////////////////////////
@@ -30,9 +32,10 @@ router.post('/login', function (req, res, next) {
             throw err
         };
         let idcheck = row[0].ID;
-        let pwcheck = row[0].password;
+        let encryptedPW = row[0].password;
+        let salt = row[0].salt;
         //id, 비번 일치
-        if (idcheck == id && pwcheck == password) {
+        if (idcheck == id && encryptedPW == makePW.comparePW(salt, password)) {
             // 알림페이지로 가기
             res.render('admin_alert', {
                 alert_type: "관리자 페이지 입니다.",
@@ -48,6 +51,38 @@ router.post('/login', function (req, res, next) {
 
     })
 });
+
+/////////////////////////////
+//관리자 페이지 비밀번호 변경//
+////////////////////////////
+router.post('/changepw', function (req, res, next) {
+    let body = req.body;
+    let pw = body.password;
+    let pwcheck = body.passwordcheck;
+
+    if (pw != pwcheck) {
+        res.render('admin_alert', {
+            alert_type: "비밀번호 변경 실패",
+            alert_details: "일치하지 않음"
+        });
+    } else {
+        let protectedPW = makePW.createPW(pw);
+        let query = "update admin set password = ?, salt = ? where ID = ?"
+        //랜덤한 비밀번호로 변경
+        connection.query(query, [protectedPW[1], protectedPW[0], 'projectQ#!@'], function (err, row) {
+            if (err) {
+                throw err
+            };
+            res.render('admin_alert', {
+                alert_type: "비밀번호 변경 성공",
+                alert_details: ""
+            });
+        })
+    }
+
+
+});
+
 
 /////////////////////////
 // 상품 추가 페이지 이동//

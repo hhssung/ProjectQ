@@ -11,9 +11,8 @@ var variables ={
     }, {
         name: 'p_explain'
     }],
-    server_files : "http://localhost:3961/files/"
-
-    
+    server_files : "http://localhost:3961/files/",
+    server_links : "http://localhost:3961/links/"   
 }
 
 

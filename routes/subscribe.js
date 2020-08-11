@@ -33,15 +33,27 @@ function setrandomtime(starttime, endtime) {
     }
 }
 
-//yyyymmdd 형태로 날짜 가공하기
+//yyyyMMdd 형태로 날짜 가공하기
 function getFormatDate(date) {
     var year = date.getFullYear(); //yyyy
     var month = (1 + date.getMonth()); //M
     month = month >= 10 ? month : '0' + month; //month 두자리로 저장
     var day = date.getDate(); //d
     day = day >= 10 ? day : '0' + day; //day 두자리로 저장
-    return '' + year + month + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
+    return '' +
+        year + month + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
 }
+
+//hhmm 형태로 시간 가공하기
+function getFormatClock(date) {
+    var hour = (1 + date.getHours()); //h
+    hour = hour >= 10 ? hour : '0' + hour; //hour 두자리로 저장
+    var minutes = date.getMinutes(); //m
+    minutes = minutes >= 10 ? minutes : '0' + minutes; //minute 두자리로 저장
+    return '' + hour + minutes;
+}
+
+
 
 ///////////////////////////
 // 구독 버튼 확인 or 취소 //
@@ -98,7 +110,7 @@ router.post('/push_setting', function (req, res) {
             checksubscribing.then((row) => {
                 //신규 구독
                 if (row.length < 1) {
-                    let insert_diary_query = "insert into diary values (0,?,?,0)";
+                    let insert_diary_query = "insert into diary values (0,?,?,0,?)";
                     let insert_chatSubscribing_query = "insert into chatSubscribing SET ?";
 
                     //diary에 정보 삽입
@@ -106,7 +118,7 @@ router.post('/push_setting', function (req, res) {
                         const today = new Date();
                         // 20170808 형식
                         let getformattoday = getFormatDate(today);
-                        connection.query(insert_diary_query, [getformattoday, getformattoday], function (err, row1) {
+                        connection.query(insert_diary_query, [getformattoday, getformattoday, 'nolink'], function (err, row1) {
                             if (err) {
                                 reject(err);
                             } else {
@@ -116,10 +128,18 @@ router.post('/push_setting', function (req, res) {
                     })
 
                     insert_diary.then((row1) => {
+                        const today = new Date();
+                        // 20170808 형식
+                        let getformattotime = getFormatClock(today);
                         let alarm_time;
                         //랜덤
                         if (pushType == 1) {
-                            alarm_time = setrandomtime(start_time, end_time);
+                            if (getformattotime > end_time) {
+                                //현재 시간보다 랜덤 끝 시간이 더 작을 경우
+                                alarm_time = setrandomtime(start_time, end_time);
+                            } else {
+                                alarm_time = setrandomtime(getformattotime, end_time);
+                            }
                         }
                         //정시
                         else {

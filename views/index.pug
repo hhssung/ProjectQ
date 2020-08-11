@@ -29,9 +29,9 @@ block content
       input(type='submit' value='signup')
 
   p
-  p 상품 시간 변경
+  p 상품 구독
   p
-  form(action=temp + "/subscribe/time_setting", method="post")
+  form(action=temp + "/subscribe/push_setting", method="post")
     div
       input(type='text' name='p_ID' placeholder='productID')
     div
@@ -40,8 +40,8 @@ block content
       input(type='text' name='end_time' placeholder='endtime')
     div
       input(type='text' name='pushType' placeholder='pushType 0 or 1')
-    //div
-      input(type='text' name='subscribe' placeholder='0구독안됨 or 1구독')
+    div
+      input(type='text' name='subscribe' placeholder='0구독취소 or 1구독')
     div
       input(type='submit' value='subscribe or not')
 
@@ -55,11 +55,13 @@ block content
       input(type='submit' value='change PW')
 
   p
-  p 링크 실험
+  p 다이어리 링크 배포 실험
   p
-  form(action=temp + "/product/lookup", method="get")
+  form(action=temp + "/makelink", method="post")
     div
-      input(type='submit' value='링크 실험용')
+      input(type='text' name='d_ID' placeholder='다이어리ID')
+    div
+      input(type='submit' value='/makelink')
 
   p
   p 관리자 페이지 이동 (미완)

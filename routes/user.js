@@ -9,6 +9,8 @@ const jwtobj = require("../config/jwt");
 
 const sendmail = require('../my_modules/sendmail');
 
+const makePW = require('../config/protectPW');
+
 //////////
 //로그인//
 //////////
@@ -17,21 +19,18 @@ router.post('/login', function (req, res) {
   let email = body.email;
   let password = body.password;
 
-  console.log(body);
-
   //이메일 확인
-  let query1 = "select password from user where email = ?";
+  let query1 = "select password,salt from user where email = ?";
   connection.query(query1, [email], function (err, row) {
     if (err) {
       throw err
     };
-    let pwcheck;
     //이메일이 있을 경우
-    console.log(row.length);
     if (row.length == 1) {
-      pwcheck = row[0].password;
+      let encryptedPW = row[0].password;
+      let salt = row[0].salt;
       //비밀번호 일치, jwt 토큰 전송
-      if (password == pwcheck) {
+      if (encryptedPW == makePW.comparePW(salt, password)) {
         let token1 = jwtobj.token(email, "50m");
         res.cookie("user", token1);
         res.json({
@@ -78,8 +77,9 @@ router.post('/signup', function (req, res) {
     }
     //없는 이메일, db에 추가
     else {
-      let query2 = "insert into user values (?,?,?)"
-      connection.query(query2, [email, name, password], function (err, row) {
+      let protectedPW = makePW.createPW(password);
+      let query2 = "insert into user values (?,?,?,null,?)"
+      connection.query(query2, [email, name, protectedPW[1], protectedPW[0]], function (err, row) {
         if (err) {
           throw err
         };
@@ -112,10 +112,11 @@ router.post('/findpw', function (req, res) {
     }
     //이메일 존재할 경우
     else {
-      let query2 = "update user set password = ? where email = ?"
+      let query2 = "update user set password = ?, salt = ? where email = ?"
       let randomPW = Math.random().toString(36).substr(2, 11); // 10자리 password
+      let protectedPW = makePW.createPW(randomPW);
       //랜덤한 비밀번호로 변경
-      connection.query(query2, [randomPW, email], function (err, row) {
+      connection.query(query2, [protectedPW[1], protectedPW[0], email], function (err, row) {
         if (err) {
           throw err
         };
@@ -127,8 +128,7 @@ router.post('/findpw', function (req, res) {
           });
         }
         //이메일 전송 실패
-        catch(e)
-        {
+        catch (e) {
           console.log(e);
           res.json({
             res: "send email failed"
@@ -138,6 +138,36 @@ router.post('/findpw', function (req, res) {
     }
   })
 });
+
+////////////////
+//비밀번호 변경//
+////////////////
+router.post('/changepw', function (req, res) {
+  //jwt 토큰 받기
+  let token = req.cookies.user;
+  let decoded = jwt.verify(token, jwtobj.secret);
+
+  if (decoded) {
+    let email = decoded.email;
+    let password = req.body.password;
+    let protectedPW = makePW.createPW(password);
+    let query = "update user set password = ?, salt = ? where email = ?"
+    //랜덤한 비밀번호로 변경
+    connection.query(query, [protectedPW[1], protectedPW[0], email], function (err, row) {
+      if (err) {
+        throw err
+      };
+      res.json({
+        res: 'successfully changed'
+      });
+    })
+  } else {
+    res.json({
+      res: '권한 없음'
+    });
+  }
+});
+
 
 
 
