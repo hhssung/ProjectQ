@@ -37,7 +37,7 @@ router.get('/lookup', function (req, res) {
         connection.query(query, email, function (err, row) {
           if (err) {
             reject(err);
-          } else { 
+          } else {
             for (let i = 0; i < row.length; i++) {
               if (i < row.length - 1 && row[i].d_ID == row[i + 1].d_ID) {
                 chating_temp = new Object();
@@ -122,7 +122,7 @@ router.post('/backup', function (req, res) {
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
-    
+
 
   } else {
     res.json({

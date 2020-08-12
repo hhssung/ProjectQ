@@ -6,26 +6,30 @@ var logger = require('morgan');
 
 const base = './routes/';
 
-var indexRouter = require(base+'index');
-var userRouter = require(base+'user');
+var indexRouter = require(base + 'index');
+var userRouter = require(base + 'user');
 
-var adminRouter = require(base+'admin');
-var admin_addProductRouter = require(base+'admin_addproduct');
-var admin_deleteProductRouter = require(base+'admin_deleteproduct');
-var productRouter = require(base+'product');
-var diaryRouter = require(base+'diary');
-var subscribeRouter = require(base+'subscribe');
-var makelinkRouter = require(base+'makelink');
+var adminRouter = require(base + 'admin');
+var admin_addProductRouter = require(base + 'admin_addproduct');
+var admin_deleteProductRouter = require(base + 'admin_deleteproduct');
+var productRouter = require(base + 'product');
+var diaryRouter = require(base + 'diary');
+var subscribeRouter = require(base + 'subscribe');
+var makelinkRouter = require(base + 'makelink');
 
 var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+// set Port
+app.set('port', process.env.PORT || 9000);
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -33,22 +37,22 @@ app.use('/', indexRouter);
 app.use('/user', userRouter);
 app.use('/admin', adminRouter);
 app.use('/admin/add_product', admin_addProductRouter);
-app.use('/admin/delete_product',admin_deleteProductRouter);
-app.use('/product',productRouter);
-app.use('/diary',diaryRouter);
-app.use('/subscribe',subscribeRouter);
-app.use('/makelink',makelinkRouter);
+app.use('/admin/delete_product', admin_deleteProductRouter);
+app.use('/product', productRouter);
+app.use('/diary', diaryRouter);
+app.use('/subscribe', subscribeRouter);
+app.use('/makelink', makelinkRouter);
 
-app.use('/files', express.static('upload'));  // http://localhost:3961/files/~~~.png 이런 식으로 불러오기 가능
-app.use('/links', express.static('links'));  // http://localhost:3961/links/~~~.html 이런 식으로 불러오기 가능
+app.use('/files', express.static('upload')); // http://localhost:3961/files/~~~.png 이런 식으로 불러오기 가능
+app.use('/links', express.static('links')); // http://localhost:3961/links/~~~.html 이런 식으로 불러오기 가능
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -59,3 +63,7 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+var server = app.listen(app.get('port'), function () {
+  console.log('Express server listening on port ' + server.address().port);
+});

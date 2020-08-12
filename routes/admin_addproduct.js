@@ -11,6 +11,11 @@ const variables = require('../my_modules/var');
 
 const XLSX = require('xlsx');
 
+// 13:59:30 같은 시간을 1359로 가공해주는 함수
+function parsetime(p_time) {
+    return p_time.substring(0, 5).replace(":", "");
+}
+
 //////////////
 // 상품 추가 //
 //////////////
@@ -30,11 +35,7 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
 
     start_time = parsetime(start_time);
     end_time = parsetime(end_time);
-    console.log(start_time);
-    console.log(end_time);
 
-    //product table에 상품 집어넣기
-    let query = "insert into product SET ?"
     let query_inputs = {
         p_ID: 0,
         p_name: p_name,
@@ -47,51 +48,57 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
         start_time: start_time,
         end_time: end_time
     }
-    var insert_product = new Promise((resolve, reject) => {
-        connection.query(query, query_inputs, function (err, row) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(row);
-            }
+
+    let query2_inputs = [];
+
+    //product table에 상품 집어넣기
+    function insertProduct() {
+        return new Promise((resolve, reject) => {
+            let query = "insert into product SET ?"
+            connection.query(query, query_inputs, function (err, row) {
+                if (err) {
+                    reject(err);
+                } else {
+                    let workbook = XLSX.readFile(__dirname + "/../upload/" + p_excel);
+                    let worksheet = workbook.Sheets["Sheet1"];
+                    const jsondata = XLSX.utils.sheet_to_json(worksheet);
+
+                    // question table에 넣을 수 있게 가공
+                    for (let i = 0; i < jsondata.length; i++) {
+                        query2_inputs.push([0, row.insertId, jsondata[i].num, jsondata[i].content]);
+                    }
+
+                    resolve();
+                }
+            })
         })
-    })
+    }
 
-    // 엑셀 파일 파싱
-    insert_product.then((row) => {
-        let workbook = XLSX.readFile(__dirname + "/../upload/" + p_excel);
-        let worksheet = workbook.Sheets["Sheet1"];
-        const jsondata = XLSX.utils.sheet_to_json(worksheet);
-
-        // question table에 넣을 수 있게 가공
-        let query2_inputs = [];
-        for (let i = 0; i < jsondata.length; i++) {
-            query2_inputs.push([0, row.insertId, jsondata[i].num, jsondata[i].content]);
-        }
-
-        // question table에 집어넣기
-        let query2 = "insert into question values ?";
-        connection.query(query2, [query2_inputs], function (err, row) {
-            if (err) {
-                throw err
-            } else {
-                // 알림페이지로 가기
-                res.render('admin_alert', {
-                    alert_type: "상품 추가 성공!!!",
-                    alert_details: ""
-                });
-            }
+    // question table에 질문들 집어넣기
+    function insertQuestions() {
+        return new Promise((resolve, reject) => {
+            let query2 = "insert into question values ?";
+            connection.query(query2, [query2_inputs], function (err, row) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            })
         })
-    }).catch(err => { //실패시
-        throw err;
-    });
+    }
+
+    insertProduct()
+        .then(insertQuestions)
+        .then(() => { // 알림페이지로 가기
+            res.render('admin_alert', {
+                alert_type: "상품 추가 성공!!!",
+                alert_details: ""
+            });
+        })
+        .catch(err => { //실패시
+            throw err;
+        });
 });
-
-// 13:59:30 같은 시간을 1359로 가공해주는 함수
-function parsetime(p_time)
-{
-    return p_time.substring(0,5).replace(":","");
-}
-
 
 module.exports = router;
