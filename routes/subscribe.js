@@ -107,7 +107,7 @@ router.post('/push_setting', function (req, res) {
                         if (err) {
                             reject(err);
                         } else {
-                            checkNewSubscriber = row.length;
+                            // 이전에 구독한 적이 있는 지 확인
                             resolve(row.length);
                         }
                     })

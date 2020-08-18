@@ -45,6 +45,7 @@ app.use('/makelink', makelinkRouter);
 
 app.use('/files', express.static('upload')); // http://localhost:3961/files/~~~.png 이런 식으로 불러오기 가능
 app.use('/links', express.static('links')); // http://localhost:3961/links/~~~.html 이런 식으로 불러오기 가능
+app.use('/pdfs', express.static('pdfs')); // http://localhost:3961/pdfs/~~~.pdf 이런 식으로 불러오기 가능
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -12,5 +12,8 @@ upload
 #no html files
 links
 
+#no pdf files
+pdfs
+
 #no DDL
 DDL.txt
