@@ -1,4 +1,4 @@
-//상품 조회
+/* 다이어리 html, pdf 만드는 모듈 */
 
 const express = require('express');
 const router = express.Router();
@@ -13,23 +13,55 @@ const variables = require('../my_modules/var');
 const jwt = require("jsonwebtoken");
 const jwtobj = require("../config/jwt");
 
-//랜덤한 링크 만들기
+/**
+ * 랜덤한 링크 생성
+ * 
+ * @function makeRandomLink
+ * 
+ * @return {string} randomString
+ * 
+ */
 function makeRandomLink() {
-    var randomString = Math.random().toString(36).substr(3, 9);
-    return Date.now() + randomString;
+    var randomString = Date.now() + Math.random().toString(36).substr(3, 9);
+    return randomString;
 }
 
-//링크 주소 만들기
+/**
+ * 링크 주소 만들기
+ * 
+ * @function makeLinkToAddress
+ * 
+ * @param {string} str
+ * @return {string} linkAddress
+ * 
+ */
 function makeLinkToAddress(str) {
-    return variables.server_links + str + ".html";
+    var linkAddress = variables.server_links + str + ".html";
+    return linkAddress;
 }
 
-//pdf 주소 만들기
+/**
+ * pdf 주소 만들기
+ * 
+ * @function makePdfToAddress
+ * 
+ * @param {string} str
+ * @return {string} linkAddress
+ * 
+ */
 function makePdfToAddress(str) {
-    return variables.server_pdfs + str + ".pdf";
+    var pdfAddress = variables.server_pdfs + str + ".pdf";
+    return pdfAddress;
 }
 
-//파일 삭제하기
+/**
+ * 파일 삭제하는 함수
+ * 
+ * @function deleteFiles
+ * 
+ * @param {Object} files -  {filepath, filepath, filepath, ... }
+ * 
+ */
 function deleteFiles(files, callback) {
     var i = files.length;
     files.forEach(function (filepath) {
@@ -45,7 +77,16 @@ function deleteFiles(files, callback) {
     });
 }
 
-//html 만들기
+/**
+ * html 만들기
+ * 
+ * @function buildHtml
+ * 
+ * @param {string} name
+ * @param {Object} contents
+ * @return {string} fullHTML
+ * 
+ */
 function buildHtml(name, contents) {
     var header = '';
     var body = '';
@@ -55,19 +96,21 @@ function buildHtml(name, contents) {
         body += ('<p>' + contents[i] + '</p>')
     }
 
-    // concatenate header string
-    // concatenate body string
+    var fullHTML = '<!DOCTYPE html>' + '<html><head><h1>' + header + '</h1></head><body>' + body + '</body></html>';
 
-    return '<!DOCTYPE html>' +
-        '<html><head><h1>' + header + '</h1></head><body>' + body + '</body></html>';
+    return fullHTML;
 }
 
-//////////////
-// 링크 배포 //
-//////////////
-
-// DB에 다이어리 링크 이미 존재 => 다이어리 html 삭제 후 그 주소로 새로 생성
-// DB에 없음 => 새로 만들기
+/**
+ * html 링크 주소 or pdf 링크 주소 반환
+ * 
+ * @module makelink
+ * 
+ * @param {Object} JWT - req
+ * @param {int} d_ID - req
+ * @param {boolean} pdfType - 0: html, 1: pdf, req
+ * 
+ */
 router.post('/', function (req, res) {
     //jwt 토큰 받기
     let token = req.cookies.user;
@@ -105,7 +148,7 @@ router.post('/', function (req, res) {
         //html 링크 만들기 or 기존에 있던 파일 삭제하기
         function makeHtmlLink() {
             return new Promise((resolve, reject) => {
-                // 링크 x, 새로운 링크 만들기
+                // 링크 없을경우 새로운 링크 만들기
                 if (linkname == 'nolink') {
                     linkname = makeRandomLink();
                     //새로운 링크 DB에 정보 집어넣기
@@ -171,6 +214,7 @@ router.post('/', function (req, res) {
             })
         }
 
+        //html pdf로 변환
         function htmlToPdf() {
             return new Promise((resolve, reject) => {
                 // html만 뱉어주는 경우
@@ -199,7 +243,7 @@ router.post('/', function (req, res) {
             .then(makeHtmlFile)
             .then(htmlToPdf)
             .then(() => {
-                // html만 뱉어주는 경우
+                // html 주소만 내보낼 경우
                 if (pdfType == 0) {
                     res.json({
                         'linkname': makeLinkToAddress(linkname)

@@ -1,4 +1,4 @@
-//상품 조회
+/* 상품 조회 */
 
 const express = require('express');
 const router = express.Router();
@@ -9,9 +9,14 @@ const connection = dbconnect.init();
 const jwt = require("jsonwebtoken");
 const jwtobj = require("../config/jwt");
 
-//////////////
-// 상품 조회 //
-//////////////
+/**
+ * 모든 상품 조회
+ * 
+ * @module productLookup
+ * 
+ * @param {Object} JWT - req
+ * 
+ */
 router.get('/lookup', function (req, res) {
   //jwt 토큰 받기
   let token = req.cookies.user;
@@ -26,14 +31,15 @@ router.get('/lookup', function (req, res) {
     var questions = new Array(); //temp2
     var q_contents;
 
-    //모든 상품 정보들 불러오기
-    function get_products() {
+    //DB로부터 모든 상품 정보들 불러오기
+    function getProducts() {
       return new Promise((resolve, reject) => {
         let query1 = "select * from product inner join question on question.fp_ID = product.p_ID";
         connection.query(query1, function (err, row) {
           if (err) {
             reject(err);
           } else {
+            // JSON으로 만들기 좋게 가공
             for (let i = 0; i < row.length; i++) {
               if (i<row.length-1 && row[i].p_ID == row[i + 1].p_ID) {
                 q_contents = new Object();
@@ -63,8 +69,8 @@ router.get('/lookup', function (req, res) {
       })
     }
 
-    //구독 된 상품 확인
-    function get_subscribed_productid() {
+    //DB에서 구독 된 상품의 정보들 가져오기
+    function getSubscribedPid() {
       return new Promise((resolve, reject) => {
         let query2 = "select * from chatSubscribing where femail = ?";
         connection.query(query2, email, function (err, row2) {
@@ -94,8 +100,8 @@ router.get('/lookup', function (req, res) {
       });
     }
 
-    get_products()
-      .then(get_subscribed_productid)
+    getProducts()
+      .then(getSubscribedPid)
       .then(() => {
         res.json({
           subscribed: subscribed,

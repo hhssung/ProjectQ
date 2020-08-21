@@ -1,3 +1,5 @@
+/* 메일 전송 모듈 */
+
 const nodemailer = require('nodemailer');
 const mymail = require('../config/mymail');
 
@@ -12,6 +14,7 @@ const transport = nodemailer.createTransport({
     }
 });
 
+//메일 전송
 function send_email(receiver_email, modified_pw) {
     let mailOptions = {
         from: mymail.mailer.user,
@@ -32,20 +35,3 @@ function send_email(receiver_email, modified_pw) {
 }
 
 module.exports = send_email;
-
-/*
-    from, to, subject, html
-
-    return new Promise((resolve, reject) => {
-        transport.sendMail({
-            from,
-            subject,
-            to,
-            html
-        }, (err, info) => {
-            if (err) return reject(err);
-            resolve(info);
-        });
-    });
-
-*/

@@ -1,3 +1,5 @@
+/* 기본 페이지 */
+
 var express = require('express');
 var router = express.Router();
 

@@ -1,4 +1,4 @@
-//구독 하기/취소 관련
+/* 구독, 구독취소 관련 */
 
 const express = require('express');
 const router = express.Router();
@@ -11,8 +11,17 @@ const jwtobj = require("../config/jwt");
 
 const variables = require('../my_modules/var');
 
-//랜덤한 시간 만들기
-function setrandomtime(starttime, endtime) {
+/**
+ * 랜덤한 시간 만들기
+ * 
+ * @function setRandomTime
+ * 
+ * @param {string} starttime - hhmm
+ * @param {string} endtime - hhmm
+ * @return {string} 시작 시간과 끝 시간 사이 랜덤한 값 - hhmm
+ * 
+ */
+function setRandomTime(starttime, endtime) {
     var date = new Date();
     var now_time = "" + date.getHours() + date.getMinutes();
     //현재 시각이 default 값보다 지났을 경우
@@ -33,18 +42,33 @@ function setrandomtime(starttime, endtime) {
     }
 }
 
-//yyyyMMdd 형태로 날짜 가공하기
+/**
+ * yyyyMMdd 형태로 날짜 가공하기
+ * 
+ * @function getFormatDate
+ * 
+ * @param {date} date 
+ * @return {string} yyyyMMdd
+ * 
+ */
 function getFormatDate(date) {
     var year = date.getFullYear(); //yyyy
     var month = (1 + date.getMonth()); //M
     month = month >= 10 ? month : '0' + month; //month 두자리로 저장
     var day = date.getDate(); //d
     day = day >= 10 ? day : '0' + day; //day 두자리로 저장
-    return '' +
-        year + month + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
+    return '' + year + month + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
 }
 
-//hhmm 형태로 시간 가공하기
+/**
+ * hhmm 형태로 시간 가공하기
+ * 
+ * @function getFormatClock
+ * 
+ * @param {date} date 
+ * @return {string} hhmm
+ * 
+ */
 function getFormatClock(date) {
     var hour = (1 + date.getHours()); //h
     hour = hour >= 10 ? hour : '0' + hour; //hour 두자리로 저장
@@ -53,10 +77,20 @@ function getFormatClock(date) {
     return '' + hour + minutes;
 }
 
-///////////////////////////
-// 구독 버튼 확인 or 취소 //
-///////////////////////////
-router.post('/push_setting', function (req, res) {
+/**
+ * 구독 버튼 확인 or 취소
+ * 
+ * @module pushsetting
+ * 
+ * @param {Object} JWT - req
+ * @param {int} p_ID - req
+ * @param {string} start_time - hhmm, req
+ * @param {string} end_time - hhmm, req
+ * @param {boolean} pushType - 0: 정시, 1: 랜덤, req
+ * @param {boolean} subscribe - 0: 구독취소하기, 1: 구독하기, req
+ * 
+ */
+router.post('/pushsetting', function (req, res) {
     //jwt 토큰 받기
     let token = req.cookies.user;
     let decoded = jwt.verify(token, jwtobj.secret);
@@ -142,9 +176,9 @@ router.post('/push_setting', function (req, res) {
                     if (pushType == 1) {
                         if (getformattotime > end_time) {
                             //현재 시간보다 랜덤 끝 시간이 더 작을 경우
-                            alarm_time = setrandomtime(start_time, end_time);
+                            alarm_time = setRandomTime(start_time, end_time);
                         } else {
-                            alarm_time = setrandomtime(getformattotime, end_time);
+                            alarm_time = setRandomTime(getformattotime, end_time);
                         }
                     }
                     //정시 pushtype일 경우
@@ -197,7 +231,7 @@ router.post('/push_setting', function (req, res) {
                             .catch(err => {
                                 throw err
                             })
-                    } 
+                    }
                     // 예전에 구독 한 적이 있을 경우
                     else {
                         updateChatSubscribing()
@@ -220,10 +254,19 @@ router.post('/push_setting', function (req, res) {
     }
 });
 
-//////////////
-// 시간 변경 //
-//////////////
-router.post('/time_setting', function (req, res) {
+/**
+ * 시간 변경
+ * 
+ * @module timesetting
+ * 
+ * @param {Object} JWT - req
+ * @param {int} p_ID - req
+ * @param {string} start_time - hhmm, req
+ * @param {string} end_time - hhmm, req
+ * @param {boolean} pushType - 0: 정시, 1: 랜덤, req
+ * 
+ */
+router.post('/timesetting', function (req, res) {
     //jwt 토큰 받기
     let token = req.cookies.user;
     let decoded = jwt.verify(token, jwtobj.secret);
@@ -239,7 +282,7 @@ router.post('/time_setting', function (req, res) {
         let alarm_time;
         //랜덤
         if (pushType == 1) {
-            alarm_time = setrandomtime(start_time, end_time);
+            alarm_time = setRandomTime(start_time, end_time);
         }
         //정시
         else {

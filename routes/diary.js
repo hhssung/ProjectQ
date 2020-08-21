@@ -1,4 +1,4 @@
-//사용자 다이어리 관련
+/* 다이어리 관련 모듈 */
 
 const express = require('express');
 const router = express.Router();
@@ -9,14 +9,28 @@ const connection = dbconnect.init();
 const jwt = require("jsonwebtoken");
 const jwtobj = require("../config/jwt");
 
-// 20180909, 0300 => 20180909 030000
-function string_to_fulltime(str_date, str_hour) {
+/**
+ * 20180909, 0300 => 20180909 030000
+ * 
+ * @function parseTime
+ * 
+ * @param {string} str_date
+ * @param {string} str_hour
+ * @return {string} - yyyyMMdd hhmmss
+ * 
+ */
+function stringToTime(str_date, str_hour) {
   return str_date + " " + str_hour;
 }
 
-//////////////////////////
-// 내가 쓴 다이어리 조회 //
-//////////////////////////
+/**
+ * 내가 이제까지 쓴 모든 다이어리 조회
+ * 
+ * @module diaryLookup
+ * 
+ * @param {Object} JWT - req
+ * 
+ */
 router.get('/lookup', function (req, res) {
   //jwt 토큰 받기
   let token = req.cookies.user;
@@ -38,16 +52,17 @@ router.get('/lookup', function (req, res) {
           if (err) {
             reject(err);
           } else {
+            // JSON으로 만들기 좋게 가공
             for (let i = 0; i < row.length; i++) {
               if (i < row.length - 1 && row[i].d_ID == row[i + 1].d_ID) {
                 chating_temp = new Object();
                 chating_temp.chatcontent = row[i].chatcontent;
-                chating_temp.time = string_to_fulltime(row[i].chateddate, row[i].chatedtime);
+                chating_temp.time = stringToTime(row[i].chateddate, row[i].chatedtime);
                 chating.push(chating_temp);
               } else {
                 chating_temp = new Object();
                 chating_temp.chatcontent = row[i].chatcontent;
-                chating_temp.time = string_to_fulltime(row[i].chateddate, row[i].chatedtime);
+                chating_temp.time = stringToTime(row[i].chateddate, row[i].chatedtime);
                 chating.push(chating_temp);
                 diary_temp = new Object();
                 diary_temp.d_ID = row[i].d_ID;
@@ -84,17 +99,25 @@ router.get('/lookup', function (req, res) {
   }
 });
 
-//////////////////
-// 다이어리 삭제 //
-//////////////////
+/**
+ * 선택한 다이어리 삭제
+ * 
+ * @module diaryDelete
+ * 
+ * @param {Object} JWT - req
+ * @param {int} d_ID - req
+ * 
+ */
 router.post('/delete', function (req, res) {
   //jwt 토큰 받기
   let token = req.cookies.user;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
-    let query = "delete from diary where d_ID = ?";
     let d_ID = req.body.d_ID;
+
+    //다이어리 DB에서 삭제
+    let query = "delete from diary where d_ID = ?";
     connection.query(query, d_ID, function (err, row) {
       if (err) {
         res.json({
@@ -113,9 +136,15 @@ router.post('/delete', function (req, res) {
   }
 });
 
-//////////////////
-// 다이어리 백업 //
-//////////////////
+/**
+ * 이제까지 쓴 모든 다이어리 백업. DB에 저장
+ * 
+ * @module diaryBackup
+ * 
+ * @param {Object} JWT - req
+ * 
+ * 
+ */
 router.post('/backup', function (req, res) {
   //jwt 토큰 받기
   let token = req.cookies.user;

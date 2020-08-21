@@ -1,3 +1,5 @@
+/* 사용자 로그인, 회원가입 관련 */
+
 const express = require('express');
 const router = express.Router();
 
@@ -11,9 +13,15 @@ const sendmail = require('../my_modules/sendmail');
 
 const makePW = require('../config/protectPW');
 
-//////////
-//로그인//
-//////////
+/**
+ * 사용자 로그인
+ * 
+ * @module userLogin
+ * 
+ * @param {string} email - req
+ * @param {string} password - req
+ * 
+ */
 router.post('/login', function (req, res) {
   let body = req.body;
   let email = body.email;
@@ -54,9 +62,16 @@ router.post('/login', function (req, res) {
   })
 });
 
-///////////
-//회원가입//
-///////////
+/**
+ * 사용자 회원가입
+ * 
+ * @module userSignup
+ * 
+ * @param {string} email - req
+ * @param {string} name - req
+ * @param {string} password - req
+ * 
+ */
 router.post('/signup', function (req, res) {
   let body = req.body;
   let email = body.email;
@@ -91,9 +106,14 @@ router.post('/signup', function (req, res) {
   })
 });
 
-/////////////////////
-//임시 비밀번호 발송//
-/////////////////////
+/**
+ * 임시 비밀번호 발송
+ * 
+ * @module userFindPW
+ * 
+ * @param {string} email - req
+ * 
+ */
 router.post('/findpw', function (req, res) {
   let body = req.body;
   let email = body.email;
@@ -139,9 +159,15 @@ router.post('/findpw', function (req, res) {
   })
 });
 
-////////////////
-//비밀번호 변경//
-////////////////
+/**
+ * 사용자 비밀번호 변경
+ * 
+ * @module userChangePW 
+ * 
+ * @param {Object} JWT - req
+ * @param {string} password - req
+ * 
+ */
 router.post('/changepw', function (req, res) {
   //jwt 토큰 받기
   let token = req.cookies.user;
