@@ -33,6 +33,8 @@ block content
   p
   form(action=temp + "/subscribe/pushsetting", method="post")
     div
+      input(type='text' name='jwt' placeholder='JWT')
+    div
       input(type='text' name='p_ID' placeholder='productID')
     div
       input(type='text' name='start_time' placeholder='starttime')
@@ -63,6 +65,8 @@ block content
     div
       input(type='text' name='pdfType' placeholder='0: link, 1: pdf')
     div
+      input(type='text' name='jwt' placeholder='JWT')
+    div
       input(type='submit' value='/makelink')
 
   p
@@ -72,3 +76,20 @@ block content
     div
       input(type='submit' value='관리자 페이지로~')
 
+  p
+  p 상품 긁어오기
+  p
+  form(action=temp + "/product/lookup", method="post")
+    div
+      input(type='text' name='jwt' placeholder='JWT')
+    div
+      input(type='submit' value='상품 긁어오기')
+
+  p
+  p 푸시하기
+  p
+  form(action=temp + "/pushalarm/message", method="post")
+    div
+      input(type='text' name='message' placeholder='메시지')
+    div
+      input(type='submit' value='푸시')

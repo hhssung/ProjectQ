@@ -1,0 +1,56 @@
+/* 모바일 기기 */
+
+@font-face {
+    font-family: 'Nanum Myeongjo';
+    src: url('http://fa2324b5d73b.ngrok.io/css/NanumMyeongjo.woff') format('woff'),
+        url('http://fa2324b5d73b.ngrok.io/css/NanumMyeongjo.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1 {
+    font-family: 'Nanum Myeongjo', Arial, Helvetica, sans-serif;
+    font-size: 2em;
+    text-align: center;
+    margin-right: 0%;
+    margin-left: 0%;
+}
+
+body {
+    font-family: 'Nanum Myeongjo', Arial, Helvetica, sans-serif;
+    margin-right: 0%;
+    margin-left: 0%;
+}
+
+table {
+    width: 100%;
+    border: 0;
+    font-size: 1.5em;
+    border-collapse: collapse;
+}
+
+td,
+tr {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    padding: 1em;
+}
+
+#date {
+    width: 20%;
+    font-weight: 800;
+    text-align: right;
+    border-right: 3px solid #444444;
+}
+
+#contents {
+    font-weight: 400;
+    line-height: 150%;
+}
+
+#time {
+    font-weight: 800;
+    text-align: right;
+    font-size: 0.6em;
+    line-height: 250%;
+}

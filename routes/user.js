@@ -27,8 +27,10 @@ router.post('/login', function (req, res) {
   let email = body.email;
   let password = body.password;
 
+  console.log(body);
+
   //이메일 확인
-  let query1 = "select password,salt from user where email = ?";
+  let query1 = "select Uname, password,salt from user where email = ?";
   connection.query(query1, [email], function (err, row) {
     if (err) {
       throw err
@@ -36,13 +38,16 @@ router.post('/login', function (req, res) {
     //이메일이 있을 경우
     if (row.length == 1) {
       let encryptedPW = row[0].password;
+      let name = row[0].Uname;
       let salt = row[0].salt;
       //비밀번호 일치, jwt 토큰 전송
       if (encryptedPW == makePW.comparePW(salt, password)) {
         let token1 = jwtobj.token(email, "50m");
+        console.log(email);
         res.cookie("user", token1);
         res.json({
           token: token1,
+          name: name,
           res: "success"
         });
       }
@@ -63,6 +68,35 @@ router.post('/login', function (req, res) {
 });
 
 /**
+ * 이메일 검증
+ * 
+ * @module userCheckEmail
+ * 
+ * @param {string} email - req
+ * 
+ */
+router.post('/checkemail', function (req, res) {
+  let email = req.body.email;
+  //이메일 중복 확인
+  let query1 = "select * from user where email = ?";
+  connection.query(query1, [email], function (err, row) {
+    if (err) {
+      throw err
+    };
+    //이메일 중복
+    if (row.length >= 1) {
+      res.json({
+        res: "already existing email"
+      });
+    } else {
+      res.json({
+        res: "success"
+      });
+    }
+  });
+});
+
+/**
  * 사용자 회원가입
  * 
  * @module userSignup
@@ -77,28 +111,14 @@ router.post('/signup', function (req, res) {
   let email = body.email;
   let name = body.name;
   let password = body.password;
-
-  //이메일 중복 확인
-  let query1 = "select * from user where email = ?";
-  connection.query(query1, [email], function (err, row) {
+  let protectedPW = makePW.createPW(password);
+  let query2 = "insert into user values (?,?,?,null,?)"
+  connection.query(query2, [email, name, protectedPW[1], protectedPW[0]], function (err, row) {
     if (err) {
-      throw err
-    };
-    //이메일 중복
-    if (row.length >= 1) {
       res.json({
-        res: "already existing email"
+        res: "failed"
       });
-    }
-    //없는 이메일, db에 추가
-    else {
-      let protectedPW = makePW.createPW(password);
-      let query2 = "insert into user values (?,?,?,null,?)"
-      connection.query(query2, [email, name, protectedPW[1], protectedPW[0]], function (err, row) {
-        if (err) {
-          throw err
-        };
-      })
+    }else{
       res.json({
         res: "signup success"
       });
@@ -170,7 +190,8 @@ router.post('/findpw', function (req, res) {
  */
 router.post('/changepw', function (req, res) {
   //jwt 토큰 받기
-  let token = req.cookies.user;
+  //let token = req.cookies.user;
+  let token = req.body.jwt;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {

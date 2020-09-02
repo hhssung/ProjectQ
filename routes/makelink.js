@@ -78,25 +78,78 @@ function deleteFiles(files, callback) {
 }
 
 /**
+ * 20200813 -> 08<br>13 형태로 가공하기
+ * 
+ * @function dateToHtml
+ * 
+ * @param {string} date 
+ * @return {string} MM<br>dd
+ * 
+ */
+function dateToHtml(date) {
+    var html = date.substring(4, 6) + '<br>' + date.substring(6, 8);
+    return html;
+}
+
+/**
+ * 0430 => 오후 4시 38분 형식으로 바꾸기
+ * 
+ * @function timeToHtml
+ * 
+ * @param {string} time
+ * @return {string} '오후 4시 38분'
+ * 
+ */
+function timeToHtml(time) {
+    var hour = parseInt(time.substring(0, 2));
+    var minute = time.substring(2, 4);
+    if (hour >= 12) {
+        return '오후 ' + (hour - 12) + '시 ' + minute + '분';
+    } else {
+        return '오전 ' + hour + '시 ' + minute + '분';
+    }
+}
+
+/**
  * html 만들기
  * 
  * @function buildHtml
  * 
  * @param {string} name
  * @param {Object} contents
+ * @param {Object} dates
+ * @param {Object} times
  * @return {string} fullHTML
  * 
  */
-function buildHtml(name, contents) {
+function buildHtml(name, contents, dates, times) {
     var header = '';
     var body = '';
 
-    header += (name + ' 님의 다이어리 입니다!!!');
-    for (let i = 0; i < contents.length; i++) {
-        body += ('<p>' + contents[i] + '</p>')
-    }
+    header += (name + ' 님의 다이어리');
+    // for (let i = 0; i < contents.length; i++) {
+    //     body += ('<p>' + contents[i] + '</p>')
+    // }
 
-    var fullHTML = '<!DOCTYPE html>' + '<html><head><h1>' + header + '</h1></head><body>' + body + '</body></html>';
+    body += '<table>';
+    for (let i = 0; i < contents.length; i++) {
+        body += '<tr>';
+        body += '<td id="date">' + dateToHtml(dates[i]) + '</td>';
+        body += '<td id="contents">' + contents[i] +
+            '<br><div id = "time">' + timeToHtml(times[i]) + '</div></td>';
+        body += '</tr>';
+    }
+    body += '</table>';
+
+    var fullHTML = '<!DOCTYPE html>' +
+        '<html><head>' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<link rel="stylesheet" href="' + variables.server_css + 'link.css" />' +
+        '<link rel="stylesheet" media="(max-width: 768px)" href="' + variables.server_css + 'mobilelink.css" /><h1>' +
+        header +
+        '</h1></head><body>' +
+        body +
+        '</body></html>';
 
     return fullHTML;
 }
@@ -113,7 +166,8 @@ function buildHtml(name, contents) {
  */
 router.post('/', function (req, res) {
     //jwt 토큰 받기
-    let token = req.cookies.user;
+    //let token = req.cookies.user;
+    let token = req.body.jwt;
     let d_ID = req.body.d_ID;
     let pdfType = req.body.pdfType;
 
@@ -182,32 +236,37 @@ router.post('/', function (req, res) {
             })
         };
 
+        let chatContents = [];
+        let chatedDate = [];
+        let chatedTime = [];
+
         //DB에서 채팅 내역 가져오기
         function getChatContent() {
             return new Promise((resolve, reject) => {
-                let query = "select chatcontent from chating WHERE fd_ID = ?"
+                let query = "select * from chating WHERE fd_ID = ?"
                 connection.query(query, d_ID, function (err, row) {
                     if (err) {
                         reject(err);
                     } else {
-                        let chatContents = [];
                         for (let i = 0; i < row.length; i++) {
                             chatContents.push(row[i].chatcontent);
+                            chatedDate.push(row[i].chateddate);
+                            chatedTime.push(row[i].chatedtime);
                         }
-                        resolve(chatContents);
+                        resolve();
                     }
                 })
             })
         }
 
         //링크에 html 파일 저장하기
-        function makeHtmlFile(chatContents) {
+        function makeHtmlFile() {
             return new Promise((resolve, reject) => {
                 var fileName = 'links/' + linkname + '.html';
                 var stream = fs.createWriteStream(fileName);
 
                 stream.once('open', function (fd) {
-                    html = buildHtml(myname, chatContents);
+                    html = buildHtml(myname, chatContents, chatedDate, chatedTime);
                     stream.end(html);
                     resolve();
                 })
@@ -224,7 +283,8 @@ router.post('/', function (req, res) {
                 // pdf로 바꿔야 하는 경우
                 else {
                     var options = {
-                        format: 'Letter'
+                        "height": "320px",
+                        "width": "320px",
                     };
                     pdf.create(html, options).toFile(__dirname + '/../pdfs/' + linkname + '.pdf', function (err, res) {
                         if (err) {

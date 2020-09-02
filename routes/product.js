@@ -17,9 +17,13 @@ const jwtobj = require("../config/jwt");
  * @param {Object} JWT - req
  * 
  */
-router.get('/lookup', function (req, res) {
+router.post('/lookup', function (req, res) {
   //jwt 토큰 받기
-  let token = req.cookies.user;
+  //let token = req.cookies.user;
+  let token = req.body.jwt;
+
+  console.log(token);
+
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {

@@ -92,7 +92,8 @@ function getFormatClock(date) {
  */
 router.post('/pushsetting', function (req, res) {
     //jwt 토큰 받기
-    let token = req.cookies.user;
+    //let token = req.cookies.user;
+    let token = req.body.jwt;
     let decoded = jwt.verify(token, jwtobj.secret);
 
     if (decoded) {
@@ -268,7 +269,8 @@ router.post('/pushsetting', function (req, res) {
  */
 router.post('/timesetting', function (req, res) {
     //jwt 토큰 받기
-    let token = req.cookies.user;
+    //let token = req.cookies.user;
+    let token = req.body.jwt;
     let decoded = jwt.verify(token, jwtobj.secret);
 
     if (decoded) {

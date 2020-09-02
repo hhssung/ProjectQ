@@ -31,9 +31,10 @@ function stringToTime(str_date, str_hour) {
  * @param {Object} JWT - req
  * 
  */
-router.get('/lookup', function (req, res) {
+router.post('/lookup', function (req, res) {
   //jwt 토큰 받기
-  let token = req.cookies.user;
+  //let token = req.cookies.user;
+  let token = req.body.jwt;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
@@ -110,7 +111,8 @@ router.get('/lookup', function (req, res) {
  */
 router.post('/delete', function (req, res) {
   //jwt 토큰 받기
-  let token = req.cookies.user;
+  //let token = req.cookies.user;
+  let token = req.body.jwt;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
@@ -147,7 +149,8 @@ router.post('/delete', function (req, res) {
  */
 router.post('/backup', function (req, res) {
   //jwt 토큰 받기
-  let token = req.cookies.user;
+  //let token = req.cookies.user;
+  let token = req.body.jwt;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {

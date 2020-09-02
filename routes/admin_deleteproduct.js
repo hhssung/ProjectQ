@@ -101,7 +101,8 @@ router.post('/', function (req, res, next) {
                         //파일 삭제
                         deleteFiles(files, function (err) {
                             if (err) {
-                                console.log(err);
+                                //console.log(err);
+                                console.log('NO such FILES');
                             } else {
                                 console.log('all files removed');
                             }
@@ -136,7 +137,7 @@ router.post('/', function (req, res, next) {
                 });
             })
             .catch(err => {
-                throw err;
+                console.log(err);
             });
     }
 });
