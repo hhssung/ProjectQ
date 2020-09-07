@@ -8,7 +8,7 @@
 ## Install
 
 ```sh
-npm start
+npm install
 ```
 
 ## Usage
@@ -22,10 +22,6 @@ npm start
 👤 **변희성**
 
 * Github: [@hhssung](https://github.com/hhssung)
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
 
 
 ***
