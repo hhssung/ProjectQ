@@ -11,7 +11,7 @@
 + Node.js
 + Express framework
 
-# 주요 기능
+## 주요 기능
 
 + 기본 기능
   + JWT를 사용한 로그인, 회원가입, 비밀번호 변경
