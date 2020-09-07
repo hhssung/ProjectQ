@@ -93,3 +93,16 @@ block content
       input(type='text' name='message' placeholder='메시지')
     div
       input(type='submit' value='푸시')
+
+  p
+  p 채팅확인
+  p
+  form(action=temp + "/chating", method="post")
+    div
+      input(type='text' name='token' placeholder='토큰')
+    div
+      input(type='text' name='q_ID' placeholder='id')
+    div
+      input(type='text' name='message' placeholder='메시지')
+    div
+      input(type='submit' value='푸시')

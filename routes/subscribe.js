@@ -100,6 +100,8 @@ router.post('/pushsetting', function (req, res) {
         let body = req.body;
         let email = decoded.email;
         let product_id = body.p_ID;
+        let product_name = body.p_name;
+        let diary_id = body.d_ID;
         let subscribe_check = body.subscribe;
         let start_time = body.start_time;
         let end_time = body.end_time;
@@ -152,21 +154,21 @@ router.post('/pushsetting', function (req, res) {
             // Diary DB에 넣기
             function insertDiary() {
                 return new Promise((resolve, reject) => {
-                    let insert_diary_query = "insert into diary values (0,?,?,0,?)";
+                    let insert_diary_query = "insert into diary values (?,?,?,?,?,0,?)";
                     const today = new Date();
                     // 20170808 형식
                     let getformattoday = getFormatDate(today);
-                    connection.query(insert_diary_query, [getformattoday, getformattoday, 'nolink'], function (err, row1) {
+                    connection.query(insert_diary_query, [diary_id, product_id, product_name, getformattoday, getformattoday, 'nolink'], function (err, row1) {
                         if (err) {
                             reject(err);
                         } else {
-                            resolve(row1);
+                            resolve();
                         }
                     })
                 })
             }
             // chatSubscribing DB에 넣기
-            function insertChatSubscribing(row1) {
+            function insertChatSubscribing() {
                 return new Promise((resolve, reject) => {
                     let insert_chatSubscribing_query = "insert into chatSubscribing SET ?";
                     const today = new Date();
@@ -189,7 +191,7 @@ router.post('/pushsetting', function (req, res) {
                     let query_inputs = {
                         femail: email,
                         fproduct_ID: product_id,
-                        fdiary_ID: row1.insertId,
+                        fdiary_ID: diary_id,
                         chatstart_time: start_time,
                         chatend_time: end_time,
                         chatalarm_time: alarm_time,

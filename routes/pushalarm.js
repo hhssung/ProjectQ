@@ -44,7 +44,6 @@ const handlePushTokens = (message) => {
                 if (err) {
                     reject(err);
                 } else {
-                    console.log("getToken!");
                     for (let i = 0; i < row.length; i++) {
                         savedPushTokens.push(row[i].pushtoken);
                     }

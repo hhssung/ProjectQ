@@ -22,8 +22,6 @@ router.post('/lookup', function (req, res) {
   //let token = req.cookies.user;
   let token = req.body.jwt;
 
-  console.log(token);
-
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
@@ -35,10 +33,10 @@ router.post('/lookup', function (req, res) {
     var questions = new Array(); //temp2
     var q_contents;
 
-    //DB로부터 모든 상품 정보들 불러오기
+    //DB로부터 '활성화된' 모든 상품 정보들 불러오기
     function getProducts() {
       return new Promise((resolve, reject) => {
-        let query1 = "select * from product inner join question on question.fp_ID = product.p_ID";
+        let query1 = "select * from product inner join question on question.fp_ID = product.p_ID where isAvailable = 1";
         connection.query(query1, function (err, row) {
           if (err) {
             reject(err);

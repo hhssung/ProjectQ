@@ -10,20 +10,6 @@ const jwt = require("jsonwebtoken");
 const jwtobj = require("../config/jwt");
 
 /**
- * 20180909, 0300 => 20180909 030000
- * 
- * @function parseTime
- * 
- * @param {string} str_date
- * @param {string} str_hour
- * @return {string} - yyyyMMdd hhmmss
- * 
- */
-function stringToTime(str_date, str_hour) {
-  return str_date + " " + str_hour;
-}
-
-/**
  * 내가 이제까지 쓴 모든 다이어리 조회
  * 
  * @module diaryLookup
@@ -48,7 +34,7 @@ router.post('/lookup', function (req, res) {
     //모든 다이어리 정보 불러오기
     function get_diary() {
       return new Promise((resolve, reject) => {
-        let query = "select d_ID, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chateddate, chatedtime from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join chating on chating.fd_ID = diary.d_ID";
+        let query = "select d_ID, dp_ID, dp_name, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chatedtime from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join chating on chating.fd_ID = diary.d_ID";
         connection.query(query, email, function (err, row) {
           if (err) {
             reject(err);
@@ -58,15 +44,17 @@ router.post('/lookup', function (req, res) {
               if (i < row.length - 1 && row[i].d_ID == row[i + 1].d_ID) {
                 chating_temp = new Object();
                 chating_temp.chatcontent = row[i].chatcontent;
-                chating_temp.time = stringToTime(row[i].chateddate, row[i].chatedtime);
+                chating_temp.time = row[i].chatedtime;
                 chating.push(chating_temp);
               } else {
                 chating_temp = new Object();
                 chating_temp.chatcontent = row[i].chatcontent;
-                chating_temp.time = stringToTime(row[i].chateddate, row[i].chatedtime);
+                chating_temp.time = row[i].chatedtime;
                 chating.push(chating_temp);
                 diary_temp = new Object();
                 diary_temp.d_ID = row[i].d_ID;
+                diary_temp.dp_ID = row[i].dp_ID;
+                diary_temp.dp_name = row[i].dp_name;
                 diary_temp.chatedperiod_start = row[i].chatedperiod_start;
                 diary_temp.chatedperiod_end = row[i].chatedperiod_end;
                 diary_temp.chatedamount = row[i].chatedamount;

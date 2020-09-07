@@ -66,9 +66,10 @@ router.post('/', upload.fields(variables.file_names), function (req, res, next) 
         img_explain: p_explain,
         excel: p_excel,
         p_intro: p_intro,
-        pushType: push_type,
         start_time: start_time,
-        end_time: end_time
+        end_time: end_time,
+        pushType: push_type,
+        isAvailable: 1
     }
 
     let query2_inputs = [];

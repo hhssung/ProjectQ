@@ -7,17 +7,24 @@ const expo = new Expo();
 const schedule = require('node-schedule');
 
 const dbconnect = require('../config/database');
+const variables = require('./var');
 const connection = dbconnect.init();
 
-let time_1159 = new schedule.RecurrenceRule();
-// time_1159 = '*/20 * * * * *';
-time_1159.dayOfWeek = [0, new schedule.Range(0, 6)];
-time_1159.hour = 23;
-time_1159.minute = 59;
-time_1159.second = 10;
+let time235910 = new schedule.RecurrenceRule();
+// time235910 = '*/20 * * * * *';
+time235910.dayOfWeek = [0, new schedule.Range(0, 6)];
+time235910.hour = 23;
+time235910.minute = 59;
+time235910.second = 10;
 
-let time_1second = new schedule.RecurrenceRule();
-time_1second = '*/20 * * * * *';
+let time00 = new schedule.RecurrenceRule();
+//time00 = '0 * * * * *';
+time00 = '*/20 * * * * *';
+
+let time30 = new schedule.RecurrenceRule();
+time30 = '30 * * * * *';
+
+
 
 /**
  * 랜덤한 시간 만들기
@@ -59,6 +66,7 @@ function getFormatClock(date) {
 }
 
 /**
+ * 매 00초마다 실행되는 함수. 
  * DB에서 시간 정보 불러와 푸시알람 보내기
  * 
  * @function sendPushAlarm
@@ -70,11 +78,13 @@ function sendPushAlarm() {
     let tokens = [];
     let emails = [];
     let notifications = [];
+    let p_ID = [];
+    let d_ID = [];
 
     //현재 시간과 일치하는 알림 시간 및 토큰 전부 찾기, NULL 토큰 제외
     function selectAlarmTime() {
         return new Promise((resolve, reject) => {
-            let query = "select pushtoken, email from user inner join chatSubscribing on email = femail where chatalarm_time = ? and pushtoken is not null"
+            let query = "select pushtoken, email, fproduct_ID, fdiary_ID from user inner join chatSubscribing on email = femail where chatalarm_time = ? and pushtoken is not null"
             connection.query(query, now_time, function (err, row) {
                 if (err) {
                     reject(err);
@@ -82,6 +92,8 @@ function sendPushAlarm() {
                     for (let i = 0; i < row.length; i++) {
                         tokens.push(row.pushtoken[i]);
                         emails.push(row.emails[i]);
+                        p_ID.push(row.fproduct_ID[i]);
+                        d_ID.push(row.fdiary_ID[i]);
                     }
                     resolve();
                 }
@@ -92,18 +104,19 @@ function sendPushAlarm() {
     // 해당 기기로 토큰 전송
     function sendToken() {
         return new Promise((resolve, reject) => {
-            for (let pushToken of tokens) {
-                if (!Expo.isExpoPushToken(pushToken)) {
-                    console.error(`Push token ${pushToken} is not a valid Expo push token`);
+            for (let i = 0; i < tokens.length; i++) {
+                if (!Expo.isExpoPushToken(tokens[i])) {
+                    console.error(`Push token ${tokens[i]} is not a valid Expo push token`);
                     continue;
                 }
                 notifications.push({
-                    to: pushToken,
+                    to: tokens[i],
                     sound: 'default',
                     title: '당신만의 일기를 써 보세요!',
                     body: now_time + "에 새로운 알림 도착~",
                     data: {
-                        res: "hello"
+                        p_ID: p_ID[i],
+                        d_ID: d_ID[i]
                     }
                 })
             }
@@ -183,6 +196,91 @@ function changeAlarmTime() {
         })
 }
 
+
+/**
+ * 매 분 0초마다 실행
+ * 채팅한 뒤 3분 뒤에 푸시알림 전송
+ * 
+ * @function chatingPushAlarm
+ * 
+ */
+function chatingPushAlarm() {
+    let date = new Date();
+    let hour = date.getHours();
+    let minutes = date.getMinutes();
+    let tokens = [];
+    let q_ID = [];
+    let message = [];
+    let notifications = [];
+
+    function getTime() {
+        return new Promise((resolve, reject) => {
+            for (let i = 0; i < variables.chatArray.length; i++) {
+                if (variables.chatArray[i].hour == hour && variables.chatArray[i].minutes == minutes) {
+                    tokens.push(variables.chatArray[i].token);
+                    q_ID.push(variables.chatArray[i].q_ID);
+                    message.push(variables.chatArray[i].message);
+                } else {
+                    //선택 된 시간대 0개
+                    if (tokens.length == 0) {
+                        break;
+                    }
+                    //선택 된 시간대 제외 전부 삭제
+                    else{
+                        variables.chatArray.splice(0, i+1);
+                        break;
+                    }
+                }
+            }
+            console.log('!!!!!!!!');
+            console.log(tokens);
+            console.log(q_ID);
+            console.log(message);
+            resolve();
+        })
+    }
+
+    // 해당 기기로 토큰 전송
+    function sendToken() {
+        return new Promise((resolve, reject) => {
+            for (let i = 0; i < tokens.length; i++) {
+                if (!Expo.isExpoPushToken(tokens[i])) {
+                    console.error(`Push token ${tokens[i]} is not a valid Expo push token`);
+                    continue;
+                }
+                notifications.push({
+                    to: tokens[i],
+                    sound: 'default',
+                    title: '답장이 왔어요!',
+                    body: message[i],
+                    data: {
+                        q_ID: q_ID
+                    }
+                })
+            }
+            let chunks = expo.chunkPushNotifications(notifications);
+            (async () => {
+                for (let chunk of chunks) {
+                    try {
+                        let receipts = await expo.sendPushNotificationsAsync(chunk);
+                        console.log(receipts);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                }
+            })()
+            resolve();
+        })
+    }
+
+    getTime()
+        .then(sendToken)
+        .catch(err => {
+            throw err
+        })
+
+}
+
 /**
  * 스케줄러
  * 
@@ -193,12 +291,16 @@ function changeAlarmTime() {
  * 
  */
 const schedules = {
-    makeRandomTime: schedule.scheduleJob(time_1159, () => {
+    makeRandomTime: schedule.scheduleJob(time235910, () => {
         changeAlarmTime();
         console.log("Every Day 23:59:10 Random time setting !!!!!!!!!!");
     }),
-    makePushAlarm: schedule.scheduleJob(time_1second, () => { //매 분 0초마다 실행
+    makePushAlarm: schedule.scheduleJob(time30, () => { //매 분 30초마다 실행
         sendPushAlarm();
+        //console.log("" + Date.now());
+    }),
+    callBackToChating: schedule.scheduleJob(time00, () => { //매 분 0초마다 실행
+        chatingPushAlarm();
         //console.log("" + Date.now());
     })
 }

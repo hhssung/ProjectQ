@@ -101,8 +101,8 @@ router.post('/addProductPage', function (req, res, next) {
 router.post('/alertToAdminPage', function (req, res, next) {
     let productlist = [];
 
-    // 상품 정보들 전부 가져오기
-    let query = "select p_ID, p_name, img_logo from product";
+    // 활성화 된 상품 정보들 전부 가져오기
+    let query = "select p_ID, p_name, img_logo from product where isAvailable = 1";
     connection.query(query, function (err, row_2) {
         if (err) {
             throw err

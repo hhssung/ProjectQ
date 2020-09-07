@@ -215,7 +215,7 @@ router.post('/changepw', function (req, res) {
   }
 });
 
-
+module.exports = router;
 
 
 
@@ -223,23 +223,23 @@ router.post('/changepw', function (req, res) {
 
 // jwt 확인하기
 
-router.get('/Loginpractice/logincheck', function (req, res, next) {
-  let token = req.cookies.user;
+// router.get('/Loginpractice/logincheck', function (req, res, next) {
+//   let token = req.cookies.user;
 
-  let decoded = jwt.verify(token, jwtobj.secret);
-  console.log(decoded.email);
-  if (decoded) {
-    res.render('index', {
-      title: '권한이 있어서 API 수행 가능'
-    });
-  } else {
-    res.render('index', {
-      title: '권한이 없습니다.'
-    });
-  }
-});
+//   let decoded = jwt.verify(token, jwtobj.secret);
+//   console.log(decoded.email);
+//   if (decoded) {
+//     res.render('index', {
+//       title: '권한이 있어서 API 수행 가능'
+//     });
+//   } else {
+//     res.render('index', {
+//       title: '권한이 없습니다.'
+//     });
+//   }
+// });
 
-module.exports = router;
+// module.exports = router;
 
 
 /*

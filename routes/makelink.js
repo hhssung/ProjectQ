@@ -78,31 +78,34 @@ function deleteFiles(files, callback) {
 }
 
 /**
- * 20200813 -> 08<br>13 형태로 가공하기
+ * time => 08<br>13 형태로 가공하기
  * 
  * @function dateToHtml
  * 
- * @param {string} date 
+ * @param {date()} time 
  * @return {string} MM<br>dd
  * 
  */
-function dateToHtml(date) {
-    var html = date.substring(4, 6) + '<br>' + date.substring(6, 8);
+function dateToHtml(time) {
+    var month = (1 + time.getMonth()); //M
+    var day = time.getDate(); //d
+    //fulltime -> MMdd 형태로 가공
+    var html = month + '<br>' + day;
     return html;
 }
 
 /**
- * 0430 => 오후 4시 38분 형식으로 바꾸기
+ * time => 오후 4시 38분 형식으로 바꾸기
  * 
  * @function timeToHtml
  * 
- * @param {string} time
+ * @param {date()} time
  * @return {string} '오후 4시 38분'
  * 
  */
 function timeToHtml(time) {
-    var hour = parseInt(time.substring(0, 2));
-    var minute = time.substring(2, 4);
+    var hour = (1 + time.getHours()); //h
+    var minutes = time.getMinutes(); //m
     if (hour >= 12) {
         return '오후 ' + (hour - 12) + '시 ' + minute + '분';
     } else {
@@ -117,12 +120,11 @@ function timeToHtml(time) {
  * 
  * @param {string} name
  * @param {Object} contents
- * @param {Object} dates
- * @param {Object} times
+ * @param {Object} times    //2020-09-02T07:59:09.172Z
  * @return {string} fullHTML
  * 
  */
-function buildHtml(name, contents, dates, times) {
+function buildHtml(name, contents, times) {
     var header = '';
     var body = '';
 
@@ -134,7 +136,7 @@ function buildHtml(name, contents, dates, times) {
     body += '<table>';
     for (let i = 0; i < contents.length; i++) {
         body += '<tr>';
-        body += '<td id="date">' + dateToHtml(dates[i]) + '</td>';
+        body += '<td id="date">' + dateToHtml(times[i]) + '</td>';
         body += '<td id="contents">' + contents[i] +
             '<br><div id = "time">' + timeToHtml(times[i]) + '</div></td>';
         body += '</tr>';
@@ -237,7 +239,6 @@ router.post('/', function (req, res) {
         };
 
         let chatContents = [];
-        let chatedDate = [];
         let chatedTime = [];
 
         //DB에서 채팅 내역 가져오기
@@ -250,7 +251,6 @@ router.post('/', function (req, res) {
                     } else {
                         for (let i = 0; i < row.length; i++) {
                             chatContents.push(row[i].chatcontent);
-                            chatedDate.push(row[i].chateddate);
                             chatedTime.push(row[i].chatedtime);
                         }
                         resolve();
@@ -266,7 +266,7 @@ router.post('/', function (req, res) {
                 var stream = fs.createWriteStream(fileName);
 
                 stream.once('open', function (fd) {
-                    html = buildHtml(myname, chatContents, chatedDate, chatedTime);
+                    html = buildHtml(myname, chatContents, chatedTime);
                     stream.end(html);
                     resolve();
                 })
@@ -301,7 +301,7 @@ router.post('/', function (req, res) {
             .then(makeHtmlLink)
             .then(getChatContent)
             .then(makeHtmlFile)
-            .then(htmlToPdf)
+            //.then(htmlToPdf)
             .then(() => {
                 // html 주소만 내보낼 경우
                 if (pdfType == 0) {
@@ -312,7 +312,7 @@ router.post('/', function (req, res) {
                 // pdf로 바꿔야 하는 경우
                 else {
                     res.json({
-                        'pdfname': makePdfToAddress(linkname)
+                        'htmls': html
                     })
                 }
             })

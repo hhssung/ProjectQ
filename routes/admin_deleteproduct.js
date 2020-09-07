@@ -142,4 +142,45 @@ router.post('/', function (req, res, next) {
     }
 });
 
+
+/**
+ * 상품 비활성화
+ * 
+ * @module adminDisableProduct
+ * 
+ * @param {Object} productID - req
+ * 
+ */
+router.post('/disable', function (req, res, next) {
+    let body = req.body;
+    let p_id = body.productID;
+
+    //상품 상태 업데이트
+    function disableProduct() {
+        return new Promise((resolve, reject) => {
+            //p_id 가공
+            let pIds = makePidQueryInput(p_id);
+            let query = "update product set isAvailable = 0 where p_ID in (" + pIds + ")";
+            connection.query(query, function (err, row) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            })
+        })
+    }
+    
+    disableProduct()
+        .then(() => {
+            res.render('admin_alert', {
+                alert_type: "상품 비활성화 성공!!!",
+                alert_details: ""
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
 module.exports = router;
