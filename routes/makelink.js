@@ -318,13 +318,13 @@ router.post('/', function (req, res) {
             })
             .catch(err => {
                 res.json({
-                    res: "failed"
+                    res: "fail"
                 })
                 console.log(err);
             });
     } else {
         res.json({
-            res: '권한 없음'
+            res: 'noAuth'
         });
     }
 });

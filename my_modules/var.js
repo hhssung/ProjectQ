@@ -1,6 +1,6 @@
 /* 전역 변수들을 모아놓은 곳 */
 
-var LINK = "http://376973220cd0.ngrok.io"
+var LINK = "http://320762bd0b32.ngrok.io"
 
 // 파일 경로
 var variables = {
@@ -13,6 +13,7 @@ var variables = {
     }, {
         name: 'p_explain'
     }],
+    server: LINK,
     server_files: LINK + "/files/",
     server_links: LINK + "/links/",
     server_pdfs: LINK + "/pdfs/",

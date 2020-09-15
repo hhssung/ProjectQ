@@ -116,11 +116,11 @@ router.post('/signup', function (req, res) {
   connection.query(query2, [email, name, protectedPW[1], protectedPW[0]], function (err, row) {
     if (err) {
       res.json({
-        res: "failed"
+        res: "fail"
       });
     }else{
       res.json({
-        res: "signup success"
+        res: "success"
       });
     }
   })
@@ -147,7 +147,7 @@ router.post('/findpw', function (req, res) {
     //이메일 없을 경우
     if (row.length == 0) {
       res.json({
-        res: "No existing email"
+        res: "noEmail"
       });
     }
     //이메일 존재할 경우
@@ -164,14 +164,14 @@ router.post('/findpw', function (req, res) {
         try {
           sendmail(email, randomPW);
           res.json({
-            res: "send email success"
+            res: "success"
           });
         }
         //이메일 전송 실패
         catch (e) {
           console.log(e);
           res.json({
-            res: "send email failed"
+            res: "fail"
           });
         }
       })
@@ -205,12 +205,12 @@ router.post('/changepw', function (req, res) {
         throw err
       };
       res.json({
-        res: 'successfully changed'
+        res: 'success'
       });
     })
   } else {
     res.json({
-      res: '권한 없음'
+      res: 'noAuth'
     });
   }
 });

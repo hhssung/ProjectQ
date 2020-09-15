@@ -1,10 +1,8 @@
 node_modules
 
 # no secure files
-config/database.js
-config/jwt.js
-config/mymail.js
-config/protectPW.js
+config
+config/kakaoKey.js
 
 #no excel/image files
 upload

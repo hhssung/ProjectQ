@@ -112,13 +112,13 @@ router.post('/lookup', function (req, res) {
       })
       .catch(err => {
         res.json({
-          res: 'failed!'
+          res: 'fail'
         });
       })
 
   } else {
     res.json({
-      res: '권한 없음'
+      res: 'noAuth'
     });
   }
 });

@@ -125,11 +125,11 @@ router.post('/pushsetting', function (req, res) {
             cancelSubscribing()
                 .then(() => {
                     res.json({
-                        res: "updated"
+                        res: "success"
                     });
                 }).catch(err => { //실패시
                     res.json({
-                        res: "cannot update"
+                        res: "fail"
                     });
                     console.log(err);
                 });
@@ -229,10 +229,12 @@ router.post('/pushsetting', function (req, res) {
                             .then(insertChatSubscribing)
                             .then(() =>
                                 res.json({
-                                    res: "updated"
+                                    res: "success"
                                 }))
                             .catch(err => {
-                                throw err
+                                res.json({
+                                    res: "fail"
+                                });
                             })
                     }
                     // 예전에 구독 한 적이 있을 경우
@@ -240,19 +242,24 @@ router.post('/pushsetting', function (req, res) {
                         updateChatSubscribing()
                             .then(() =>
                                 res.json({
-                                    res: "updated"
+                                    res: "success"
                                 }))
                             .catch(err => {
-                                throw err
+                                res.json({
+                                    res: "fail"
+                                });
                             })
                     }
-                }).catch(err => {
-                    throw err
+                })
+                .catch(err => {
+                    res.json({
+                        res: "fail"
+                    });
                 })
         }
     } else {
         res.json({
-            res: 'jwt expired'
+            res: 'noAuth'
         });
     }
 });
@@ -297,17 +304,17 @@ router.post('/timesetting', function (req, res) {
         connection.query(query, query_input, function (err, row) {
             if (err) {
                 res.json({
-                    res: "query err"
+                    res: "fail"
                 })
             } else {
                 res.json({
-                    res: "updated"
+                    res: "success"
                 })
             }
         });
     } else {
         res.json({
-            res: 'jwt expired'
+            res: 'noAuth'
         });
     }
 });

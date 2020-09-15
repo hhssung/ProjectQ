@@ -77,13 +77,13 @@ router.post('/lookup', function (req, res) {
       })
       .catch(err => {
         res.json({
-          res: 'failed!'
+          res: 'fail'
         });
       })
 
   } else {
     res.json({
-      res: '권한 없음'
+      res: 'noAuth'
     });
   }
 });
@@ -111,17 +111,17 @@ router.post('/delete', function (req, res) {
     connection.query(query, d_ID, function (err, row) {
       if (err) {
         res.json({
-          res: 'query err'
+          res: 'fail'
         });
       } else {
         res.json({
-          res: 'updated'
+          res: 'success'
         });
       }
     })
   } else {
     res.json({
-      res: '권한 없음'
+      res: 'noAuth'
     });
   }
 });
@@ -146,7 +146,7 @@ router.post('/backup', function (req, res) {
 
   } else {
     res.json({
-      res: '권한 없음'
+      res: 'noAuth'
     });
   }
 });
