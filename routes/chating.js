@@ -1,4 +1,4 @@
-/* 다이어리 html, pdf 만드는 모듈 */
+/* user가 채팅을 했을 경우 3분 뒤 응답을 보내기 위해 정보 저장 */
 
 const express = require('express');
 const router = express.Router();
@@ -6,8 +6,6 @@ const router = express.Router();
 const dbconnect = require("../config/database");
 const connection = dbconnect.init();
 
-const fs = require('fs');
-const pdf = require('html-pdf');
 const variables = require('../my_modules/var');
 
 const jwt = require("jsonwebtoken");
@@ -16,7 +14,7 @@ const jwtobj = require("../config/jwt");
 let info = new Object();
 
 /**
- * html 링크 주소 or pdf 링크 주소 반환
+ * 3분 뒤 해당 token으로 push알림 보내기 위해 array에 정보 저장
  * 
  * @module chating
  * 
@@ -47,7 +45,7 @@ router.post('/', function (req, res) {
     minutes += 2;
     variables.chatArray.push({token, q_ID, message, hour, minutes});
     
-    console.log(variables.chatArray);
+    //console.log(variables.chatArray);
     res.json({
         res: "success"
     })

@@ -10,6 +10,24 @@ const jwt = require("jsonwebtoken");
 const jwtobj = require("../config/jwt");
 
 /**
+ * yyyyMMdd 형태로 날짜 가공하기
+ * 
+ * @function getFormatDate
+ * 
+ * @param {date} date 
+ * @return {string} yyyyMMdd
+ * 
+ */
+function getFormatDate(date) {
+  var year = date.getFullYear(); //yyyy
+  var month = (1 + date.getMonth()); //M
+  month = month >= 10 ? month : '0' + month; //month 두자리로 저장
+  var day = date.getDate(); //d
+  day = day >= 10 ? day : '0' + day; //day 두자리로 저장
+  return '' + year + month + day; //'-' 추가하여 yyyy-mm-dd 형태 생성 가능
+}
+
+/**
  * 내가 이제까지 쓴 모든 다이어리 조회
  * 
  * @module diaryLookup
@@ -34,11 +52,13 @@ router.post('/lookup', function (req, res) {
     //모든 다이어리 정보 불러오기
     function get_diary() {
       return new Promise((resolve, reject) => {
-        let query = "select d_ID, dp_ID, dp_name, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chatedtime from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join chating on chating.fd_ID = diary.d_ID";
+        let query = "select d_ID, dp_ID, dp_name, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chatedtime from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join diaryMessage on diaryMessage.fd_ID = diary.d_ID";
         connection.query(query, email, function (err, row) {
           if (err) {
+            console.log(row);
             reject(err);
           } else {
+            
             // JSON으로 만들기 좋게 가공
             for (let i = 0; i < row.length; i++) {
               if (i < row.length - 1 && row[i].d_ID == row[i + 1].d_ID) {
@@ -72,7 +92,7 @@ router.post('/lookup', function (req, res) {
     get_diary()
       .then(() => {
         res.json({
-          res: diary
+          diary: diary
         });
       })
       .catch(err => {
@@ -132,17 +152,81 @@ router.post('/delete', function (req, res) {
  * @module diaryBackup
  * 
  * @param {Object} JWT - req
- * 
+ * @param {Object} diary - req
  * 
  */
 router.post('/backup', function (req, res) {
   //jwt 토큰 받기
   //let token = req.cookies.user;
   let token = req.body.jwt;
+  let diary = req.body.diary;
   let decoded = jwt.verify(token, jwtobj.secret);
 
   if (decoded) {
+    let diaryinput = [];
+    let diaryMessageinput = [];
+    let dmessages;
 
+    // const today = new Date();
+    // let chatedperiod_end = getFormatDate(today);
+
+    //DB에 집어넣을 데이터 가공
+    function processingData() {
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < diary.length; i++) {
+          diaryinput.push([diary[i].d_ID, diary[i].p_ID, diary[i].p_name, diary[i].chatedperiod_start, diary[i].chatedperiod_end, diary[i].chatedamount, diary[i].linkname]);
+          dmessages = diary[i].diaryMessage;
+          for (let j = 0; j < dmessages.length; j++) {
+            diaryMessageinput.push([dmessages[j].dm_ID, diary[i].d_ID, dmessages[j].chatcontent, dmessages[j].chatedtime]);
+          }
+        }
+        console.log(diaryinput);
+        console.log(diaryMessageinput);
+        resolve();
+      })
+    }
+
+    //DB - diary table에 집어넣기
+    function putIntoDiary() {
+      return new Promise((resolve, reject) => {
+        let query = "insert into diary values ? ON DUPLICATE KEY UPDATE dp_name = CONCAT(VALUES(dp_name)), chatedperiod_start = CONCAT(VALUES(chatedperiod_start)), chatedperiod_end = CONCAT(VALUES(chatedperiod_end)), chatedamount = CONCAT(VALUES(chatedamount)), linkname = CONCAT(VALUES(linkname));"; //diary insert
+        connection.query(query, [diaryinput], function (err, row) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        })
+      })
+    }
+
+    //DB - diaryMessage table에 집어넣기
+    function putIntoDiaryMessage() {
+      return new Promise((resolve, reject) => {
+        let query2 = "insert into diaryMessage values ? ON DUPLICATE KEY UPDATE chatcontent = CONCAT(VALUES(chatcontent)), chatedtime = CONCAT(VALUES(chatedtime));"; //diaryMessage insert
+        connection.query(query2, [diaryMessageinput], function (err, row) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        })
+      })
+    }
+
+    processingData()
+      .then(putIntoDiary)
+      .then(putIntoDiaryMessage)
+      .then(() => {
+        res.json({
+          res: 'success'
+        });
+      })
+      .catch(err => {
+        res.json({
+          res: 'fail'
+        });
+      })
 
   } else {
     res.json({

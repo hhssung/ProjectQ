@@ -232,6 +232,7 @@ router.post('/pushsetting', function (req, res) {
                                     res: "success"
                                 }))
                             .catch(err => {
+                                console.log(err);
                                 res.json({
                                     res: "fail"
                                 });

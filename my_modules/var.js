@@ -1,6 +1,6 @@
 /* 전역 변수들을 모아놓은 곳 */
 
-var LINK = "http://320762bd0b32.ngrok.io"
+var LINK = "http://8fb5114fd468.ngrok.io"
 
 // 파일 경로
 var variables = {

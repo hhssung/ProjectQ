@@ -7,7 +7,7 @@ const dbconnect = require("../config/database");
 const connection = dbconnect.init();
 
 const fs = require('fs');
-const pdf = require('html-pdf');
+//const pdf = require('html-pdf');
 const variables = require('../my_modules/var');
 
 const jwt = require("jsonwebtoken");
@@ -107,9 +107,9 @@ function timeToHtml(time) {
     var hour = (1 + time.getHours()); //h
     var minutes = time.getMinutes(); //m
     if (hour >= 12) {
-        return '오후 ' + (hour - 12) + '시 ' + minute + '분';
+        return '오후 ' + (hour - 12) + '시 ' + minutes + '분';
     } else {
-        return '오전 ' + hour + '시 ' + minute + '분';
+        return '오전 ' + hour + '시 ' + minutes + '분';
     }
 }
 
@@ -134,11 +134,13 @@ function buildHtml(name, contents, times) {
     // }
 
     body += '<table>';
+    console.log(times);
     for (let i = 0; i < contents.length; i++) {
+        let temp = new Date(times[i]);
         body += '<tr>';
-        body += '<td id="date">' + dateToHtml(times[i]) + '</td>';
+        body += '<td id="date">' + dateToHtml(temp) + '</td>';
         body += '<td id="contents">' + contents[i] +
-            '<br><div id = "time">' + timeToHtml(times[i]) + '</div></td>';
+            '<br><div id = "time">' + timeToHtml(temp) + '</div></td>';
         body += '</tr>';
     }
     body += '</table>';
@@ -244,7 +246,7 @@ router.post('/', function (req, res) {
         //DB에서 채팅 내역 가져오기
         function getChatContent() {
             return new Promise((resolve, reject) => {
-                let query = "select * from chating WHERE fd_ID = ?"
+                let query = "select * from diaryMessage WHERE fd_ID = ?"
                 connection.query(query, d_ID, function (err, row) {
                     if (err) {
                         reject(err);
@@ -317,10 +319,10 @@ router.post('/', function (req, res) {
                 }
             })
             .catch(err => {
+                console.log(err);
                 res.json({
                     res: "fail"
                 })
-                console.log(err);
             });
     } else {
         res.json({
