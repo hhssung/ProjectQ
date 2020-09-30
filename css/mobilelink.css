@@ -2,8 +2,8 @@
 
 @font-face {
     font-family: 'Nanum Myeongjo';
-    src: url('http://dca77aca8a8c.ngrok.io/css/NanumMyeongjo.woff') format('woff'),
-        url('http://dca77aca8a8c.ngrok.io/css/NanumMyeongjo.ttf') format('truetype');
+    src: url('http://qmoment.qmoment.tk:9000/css/NanumMyeongjo.woff') format('woff'),
+        url('http://qmoment.qmoment.tk:9000/css/NanumMyeongjo.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }

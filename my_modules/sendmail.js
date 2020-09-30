@@ -19,8 +19,8 @@ function send_email(receiver_email, modified_pw) {
     let mailOptions = {
         from: mymail.mailer.user,
         to: receiver_email,
-        subject: '[projectQ] 비밀번호 변경',
-        html: `ProjectQ 비밀번호 변경 안내<br/>
+        subject: '[Qmoment] 비밀번호 변경',
+        html: `Qmoment 비밀번호 변경 안내<br/>
         비밀번호가 변경되었습니다. 마이페이지에서 다시 비밀번호를 변경해 주세요!<br/>
         <span style='font-size: 1.5em; color: red;'>${modified_pw}</span><br/>
         감사합니다!`

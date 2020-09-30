@@ -154,7 +154,7 @@ router.post('/pushsetting', function (req, res) {
             // Diary DB에 넣기
             function insertDiary() {
                 return new Promise((resolve, reject) => {
-                    let insert_diary_query = "insert into diary values (?,?,?,?,?,0,?)";
+                    let insert_diary_query = "insert into diary values (?,?,?,?,?,0,?,0,0)";
                     const today = new Date();
                     // 20170808 형식
                     let getformattoday = getFormatDate(today);

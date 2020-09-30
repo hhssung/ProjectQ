@@ -36,6 +36,7 @@ router.post('/lookup', function (req, res) {
             if (i < row.length - 1 && row[i].p_ID == row[i + 1].p_ID) {
               q_contents = new Object();
               q_contents.content = row[i].q_content;
+              q_contents.q_ID = row[i].q_ID;
               questions.push(q_contents);
             } else {
               q_contents = new Object();
@@ -128,7 +129,7 @@ router.post('/userlookup', function (req, res) {
     //DB에서 구독 된 상품의 정보들 가져오기
     function getSubscribedPid() {
       return new Promise((resolve, reject) => {
-        let query = "select * from chatSubscribing where femail = ?";
+        let query = "select * from chatSubscribing where femail = ? and subscribe_check = 1";
         connection.query(query, email, function (err, row) {
           if (err) {
             reject(err);

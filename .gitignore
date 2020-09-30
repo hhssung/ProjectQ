@@ -4,6 +4,9 @@ node_modules
 config
 config/kakaoKey.js
 
+# no my_modules
+my_modules/var.js
+
 #no excel/image files
 upload
 

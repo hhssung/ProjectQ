@@ -127,6 +127,7 @@ function timeToHtml(time) {
 function buildHtml(name, contents, times) {
     var header = '';
     var body = '';
+    var css = variables.makelink_css;
 
     header += (name + ' 님의 다이어리');
     // for (let i = 0; i < contents.length; i++) {
@@ -134,7 +135,6 @@ function buildHtml(name, contents, times) {
     // }
 
     body += '<table>';
-    console.log(times);
     for (let i = 0; i < contents.length; i++) {
         let temp = new Date(times[i]);
         body += '<tr>';
@@ -147,9 +147,7 @@ function buildHtml(name, contents, times) {
 
     var fullHTML = '<!DOCTYPE html>' +
         '<html><head>' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<link rel="stylesheet" href="' + variables.server_css + 'link.css" />' +
-        '<link rel="stylesheet" media="(max-width: 768px)" href="' + variables.server_css + 'mobilelink.css" /><h1>' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0"> <style type="text/css">'+css+'</style><h1>' +
         header +
         '</h1></head><body>' +
         body +

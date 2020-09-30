@@ -232,10 +232,10 @@ function chatingPushAlarm() {
                     }
                 }
             }
-            console.log('!!!!!!!!');
-            console.log(tokens);
-            console.log(q_ID);
-            console.log(message);
+            // console.log('!!!!!!!!');
+            // console.log(tokens);
+            // console.log(q_ID);
+            // console.log(message);
             resolve();
         })
     }

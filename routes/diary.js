@@ -52,13 +52,12 @@ router.post('/lookup', function (req, res) {
     //모든 다이어리 정보 불러오기
     function get_diary() {
       return new Promise((resolve, reject) => {
-        let query = "select d_ID, dp_ID, dp_name, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chatedtime from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join diaryMessage on diaryMessage.fd_ID = diary.d_ID";
+        let query = "select d_ID, dp_ID, dp_name, chatedperiod_start, chatedperiod_end, chatedamount, chatcontent, chatedtime, color, position from diary inner join chatSubscribing on femail = ? and fdiary_ID = d_ID inner join diaryMessage on diaryMessage.fd_ID = diary.d_ID";
         connection.query(query, email, function (err, row) {
           if (err) {
             console.log(row);
             reject(err);
-          } else {
-            
+          } else {  
             // JSON으로 만들기 좋게 가공
             for (let i = 0; i < row.length; i++) {
               if (i < row.length - 1 && row[i].d_ID == row[i + 1].d_ID) {
@@ -78,6 +77,8 @@ router.post('/lookup', function (req, res) {
                 diary_temp.chatedperiod_start = row[i].chatedperiod_start;
                 diary_temp.chatedperiod_end = row[i].chatedperiod_end;
                 diary_temp.chatedamount = row[i].chatedamount;
+                diary_temp.color = row[i].color;
+                diary_temp.position = row[i].position;
                 diary_temp.chating = chating;
                 diary.push(diary_temp);
                 chating = new Array();
@@ -174,7 +175,7 @@ router.post('/backup', function (req, res) {
     function processingData() {
       return new Promise((resolve, reject) => {
         for (let i = 0; i < diary.length; i++) {
-          diaryinput.push([diary[i].d_ID, diary[i].p_ID, diary[i].p_name, diary[i].chatedperiod_start, diary[i].chatedperiod_end, diary[i].chatedamount, diary[i].linkname]);
+          diaryinput.push([diary[i].d_ID, diary[i].p_ID, diary[i].p_name, diary[i].chatedperiod_start, diary[i].chatedperiod_end, diary[i].chatedamount, diary[i].linkname, diary[i].color, diary[i].position]);
           dmessages = diary[i].diaryMessage;
           for (let j = 0; j < dmessages.length; j++) {
             diaryMessageinput.push([dmessages[j].dm_ID, diary[i].d_ID, dmessages[j].chatcontent, dmessages[j].chatedtime]);
@@ -189,7 +190,7 @@ router.post('/backup', function (req, res) {
     //DB - diary table에 집어넣기
     function putIntoDiary() {
       return new Promise((resolve, reject) => {
-        let query = "insert into diary values ? ON DUPLICATE KEY UPDATE dp_name = CONCAT(VALUES(dp_name)), chatedperiod_start = CONCAT(VALUES(chatedperiod_start)), chatedperiod_end = CONCAT(VALUES(chatedperiod_end)), chatedamount = CONCAT(VALUES(chatedamount)), linkname = CONCAT(VALUES(linkname));"; //diary insert
+        let query = "insert into diary values ? ON DUPLICATE KEY UPDATE dp_name = CONCAT(VALUES(dp_name)), chatedperiod_start = CONCAT(VALUES(chatedperiod_start)), chatedperiod_end = CONCAT(VALUES(chatedperiod_end)), chatedamount = CONCAT(VALUES(chatedamount)), linkname = CONCAT(VALUES(linkname)),color = CONCAT(VALUES(color)),position = CONCAT(VALUES(position));"; //diary insert
         connection.query(query, [diaryinput], function (err, row) {
           if (err) {
             reject(err);
