@@ -89,8 +89,10 @@ function deleteFiles(files, callback) {
 function dateToHtml(time) {
     var month = (1 + time.getMonth()); //M
     var day = time.getDate(); //d
+    month = month >= 10 ? month : '0' + month;
+    day = day>=10 ? day : '0'+day;
     //fulltime -> MMdd 형태로 가공
-    var html = month + '<br>' + day;
+    var html = ''+month + '<br>' + day;
     return html;
 }
 
@@ -124,7 +126,7 @@ function timeToHtml(time) {
  * @return {string} fullHTML
  * 
  */
-function buildHtml(name, contents, times) {
+function buildHtml(name, contents, times, pdfType) {
     var header = '';
     var body = '';
     var css = variables.makelink_css;
@@ -145,13 +147,31 @@ function buildHtml(name, contents, times) {
     }
     body += '</table>';
 
-    var fullHTML = '<!DOCTYPE html>' +
+    var fullHTML;
+    
+    // 웹 링크용 HTML
+    if(pdfType==0)
+    {
+        fullHTML = '<!DOCTYPE html>' +
+        '<html><head>' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<link rel="stylesheet" href="' + variables.server_css + 'link.css" />' +
+        '<link rel="stylesheet" media="(max-width: 768px)" href="' + variables.server_css + 'mobilelink.css" /><h1>' +
+        header +
+        '</h1></head><body>' +
+        body +
+        '</body></html>';
+    }
+    // PDF용 HTML
+    else{
+        fullHTML = '<!DOCTYPE html>' +
         '<html><head>' +
         '<meta name="viewport" content="width=device-width, initial-scale=1.0"> <style type="text/css">'+css+'</style><h1>' +
         header +
         '</h1></head><body>' +
         body +
         '</body></html>';
+    }
 
     return fullHTML;
 }
@@ -266,7 +286,7 @@ router.post('/', function (req, res) {
                 var stream = fs.createWriteStream(fileName);
 
                 stream.once('open', function (fd) {
-                    html = buildHtml(myname, chatContents, chatedTime);
+                    html = buildHtml(myname, chatContents, chatedTime, pdfType);
                     stream.end(html);
                     resolve();
                 })

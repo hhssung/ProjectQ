@@ -12,14 +12,16 @@ const connection = dbconnect.init();
 
 let time235910 = new schedule.RecurrenceRule();
 // time235910 = '*/20 * * * * *';
+
+// 23h 에서 9 빼야 됨
 time235910.dayOfWeek = [0, new schedule.Range(0, 6)];
-time235910.hour = 23;
+time235910.hour = 14;
 time235910.minute = 59;
 time235910.second = 10;
 
 let time00 = new schedule.RecurrenceRule();
 //time00 = '0 * * * * *';
-time00 = '*/20 * * * * *';
+time00 = '0 * * * * *';
 
 let time30 = new schedule.RecurrenceRule();
 time30 = '30 * * * * *';
@@ -50,6 +52,7 @@ function setrandomtime(starttime, endtime) {
 
 /**
  * hhmm 형태로 시간 가공하기
+ * 한국 시간으로 바꾸기
  * 
  * @function getFormatClock
  * 
@@ -59,6 +62,8 @@ function setrandomtime(starttime, endtime) {
  */
 function getFormatClock(date) {
     var hour = date.getHours(); //h
+    hour += 9;
+    hour = hour > 24 ? hour-24 : hour ;
     hour = hour >= 10 ? hour : '0' + hour; //hour 두자리로 저장
     var minutes = date.getMinutes(); //m
     minutes = minutes >= 10 ? minutes : '0' + minutes; //minute 두자리로 저장
@@ -74,12 +79,15 @@ function getFormatClock(date) {
  */
 function sendPushAlarm() {
     const today = new Date();
-    var now_time = getFormatClock(today);;
+    var now_time = getFormatClock(today);
+    console.log(now_time);
     let tokens = [];
     let emails = [];
     let notifications = [];
     let p_ID = [];
     let d_ID = [];
+
+    console.log(now_time);
 
     //현재 시간과 일치하는 알림 시간 및 토큰 전부 찾기, NULL 토큰 제외
     function selectAlarmTime() {
@@ -90,10 +98,10 @@ function sendPushAlarm() {
                     reject(err);
                 } else {
                     for (let i = 0; i < row.length; i++) {
-                        tokens.push(row.pushtoken[i]);
-                        emails.push(row.emails[i]);
-                        p_ID.push(row.fproduct_ID[i]);
-                        d_ID.push(row.fdiary_ID[i]);
+                        tokens.push(row[i].pushtoken);
+                        emails.push(row[i].emails);
+                        p_ID.push(row[i].fproduct_ID);
+                        d_ID.push(row[i].fdiary_ID);
                     }
                     resolve();
                 }
@@ -141,7 +149,7 @@ function sendPushAlarm() {
             throw err
         })
 
-    console.log(now_time);
+    //console.log(now_time);
 }
 
 /**
@@ -155,7 +163,7 @@ function changeAlarmTime() {
     let femail = [];
     let fproduct_ID = [];
     let new_chatalarm_time = [];
-
+    console.log(variables.chatArray);
     function selectRandomType() {
         return new Promise((resolve, reject) => {
             let query = "select * from chatSubscribing where chatstart_time != chatend_time";
@@ -194,6 +202,7 @@ function changeAlarmTime() {
         .catch(err => {
             throw err
         })
+    
 }
 
 
@@ -297,11 +306,11 @@ const schedules = {
     }),
     makePushAlarm: schedule.scheduleJob(time30, () => { //매 분 30초마다 실행
         sendPushAlarm();
-        //console.log("" + Date.now());
+        console.log("makePushAlarm: " + Date.now());
     }),
     callBackToChating: schedule.scheduleJob(time00, () => { //매 분 0초마다 실행
         chatingPushAlarm();
-        //console.log("" + Date.now());
+        console.log("callBackToChating: " + Date.now());
     })
 }
 

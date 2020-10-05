@@ -122,7 +122,7 @@ router.post('/userlookup', function (req, res) {
   var subscribed = new Array();
   var subscribed_item; // temp
   let decoded = jwt.verify(token, jwtobj.secret);
-
+  console.log("hello");
   if (decoded) {
     let email = decoded.email;
 

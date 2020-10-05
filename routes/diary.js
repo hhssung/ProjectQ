@@ -175,7 +175,7 @@ router.post('/backup', function (req, res) {
     function processingData() {
       return new Promise((resolve, reject) => {
         for (let i = 0; i < diary.length; i++) {
-          diaryinput.push([diary[i].d_ID, diary[i].p_ID, diary[i].p_name, diary[i].chatedperiod_start, diary[i].chatedperiod_end, diary[i].chatedamount, diary[i].linkname, diary[i].color, diary[i].position]);
+          diaryinput.push([diary[i].d_ID, diary[i].p_ID, diary[i].p_name, diary[i].chatedperiod_start, diary[i].chatedperiod_end, diary[i].chatedamount, diary[i].color, diary[i].position]);
           dmessages = diary[i].diaryMessage;
           for (let j = 0; j < dmessages.length; j++) {
             diaryMessageinput.push([dmessages[j].dm_ID, diary[i].d_ID, dmessages[j].chatcontent, dmessages[j].chatedtime]);
@@ -190,7 +190,7 @@ router.post('/backup', function (req, res) {
     //DB - diary table에 집어넣기
     function putIntoDiary() {
       return new Promise((resolve, reject) => {
-        let query = "insert into diary values ? ON DUPLICATE KEY UPDATE dp_name = CONCAT(VALUES(dp_name)), chatedperiod_start = CONCAT(VALUES(chatedperiod_start)), chatedperiod_end = CONCAT(VALUES(chatedperiod_end)), chatedamount = CONCAT(VALUES(chatedamount)), linkname = CONCAT(VALUES(linkname)),color = CONCAT(VALUES(color)),position = CONCAT(VALUES(position));"; //diary insert
+        let query = "insert into diary values ? ON DUPLICATE KEY UPDATE dp_name = CONCAT(VALUES(dp_name)), chatedperiod_start = CONCAT(VALUES(chatedperiod_start)), chatedperiod_end = CONCAT(VALUES(chatedperiod_end)), chatedamount = CONCAT(VALUES(chatedamount)),color = CONCAT(VALUES(color)),position = CONCAT(VALUES(position));"; //diary insert
         connection.query(query, [diaryinput], function (err, row) {
           if (err) {
             reject(err);

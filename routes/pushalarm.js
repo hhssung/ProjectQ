@@ -20,9 +20,10 @@ let savedPushTokens = [];
 
 // 토큰 DB에 저장
 const saveToken = (token, email) => {
-    console.log(token,email);
+    console.log("token: ", token);
+    console.log("email: ", email);
     let query = "UPDATE user SET pushtoken = ? where email = ?"
-    connection.query(query, [token, email], function (err, row) {
+    connection.query(query, [token.data, email], function (err, row) {
         if (err) {
             throw err;
         } else {

@@ -42,7 +42,7 @@ router.post('/login', function (req, res) {
       let salt = row[0].salt;
       //비밀번호 일치, jwt 토큰 전송
       if (encryptedPW == makePW.comparePW(salt, password)) {
-        let token1 = jwtobj.token(email, "50m");
+        let token1 = jwtobj.token(email, "600m");
         console.log(email);
         res.cookie("user", token1);
         res.json({

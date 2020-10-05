@@ -42,10 +42,10 @@ router.post('/', function (req, res) {
         }
     }
 
-    minutes += 2;
+    minutes += 1;
     variables.chatArray.push({token, q_ID, message, hour, minutes});
     
-    //console.log(variables.chatArray);
+    console.log(variables.chatArray);
     res.json({
         res: "success"
     })
